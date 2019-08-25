@@ -11,10 +11,10 @@ INCLUDE = -I.
 SOURCES = $(wildcard *.c)
 OBJS = $(patsubst %.c,%.o,$(SOURCES))
  
-TARGET  = test.exe
+TARGET  = main.exe
  
 All:$(OBJS)
-	$(CC) -o $(TARGET) $(OBJS)	
+	$(CC) -g -o $(TARGET) $(OBJS)	
  
 %.o:%.c
 	$(CC) -c $(CFLAGS_WARN) $(DEFINE) $(INCLUDE) $< -o $@	

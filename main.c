@@ -3,6 +3,7 @@ int main(int argc, char const *argv[])
 {    
     char OP[MAX];
     int i=0;
+    //printf("sizeof(int) is %d\n",sizeof(int));
     PrintMap();
     while (TRUE)
     {
@@ -31,6 +32,9 @@ int main(int argc, char const *argv[])
             case '5':
                 SequenceToConsequent();
                 break;
+            case 'q':
+                printf("Bye! Quit main function.\n");
+                return SUCCESS;
             default:
                 printf("\ninput Number is error!\n");
                 return FAULT;
@@ -48,6 +52,7 @@ void PrintMap()
     printf("   3       PListPrint              Use list to print out the number in the input string!\n");
     printf("   4       ChangeDigitalList       Print numbers in a pyramid!\n");
     printf("   5       SequenceToConsequent    Converting an intermediate input to a sequential input!\n");
+    printf("   q       Quitmain                Quit main Function!\n");
     return;
 }
 
