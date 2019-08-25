@@ -28,7 +28,7 @@ int TscanfDigital();
 int Talgorithm();
 void Free_Memory(char *str);
 int scanfDigitalNumList(char *str);
-int pListPrint();
+int PListPrint();
 int scanf_s(const char *restrict format, ...);
 //errno_t memcpy_s(void * restrict dest, rsize_t destsz, const void * restrict src, rsize_t count);
 //errno_t memset_s(void * dest, rsize_t destsz, int ch, rsize_t count);
@@ -41,6 +41,7 @@ int debugPostfix(char* infix);
 void debugPostfixPrintLine(char *op,char *stack,int stackStart,char *out,int outStart);
 void debugPostfixPrintf(mSQTOCQ *PostfixList);
 int ChangeDigitalList();
+void PrintMap();
 #endif
 
 

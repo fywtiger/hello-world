@@ -43,10 +43,10 @@ int Talgorithm()
 void SequenceToConsequent()
 {
     int i=0,j=0;    
-    char input[MAX];  
-    char inputCheck[MAX];  
+    char input[MAX]={0};  
+    char inputCheck[MAX]={0};  
     printf("please input infix: \n");
-    gets(input);
+    scanf("%s",input);
     //printf("input is %s\n",input);
     while('\0'!=input[i])
     {

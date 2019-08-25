@@ -7,7 +7,7 @@ typedef struct nList
     struct nList *next;
 }DigitalList;
 
-int pListPrint()
+int PListPrint()
 {
     char *inputNumList;
     
@@ -108,7 +108,7 @@ int ChangeDigitalList()
     unsigned int nline=1;
     unsigned int nTotal;
 
-    printf("Please input the number:");
+    printf("Please input a number of line:");
     scanf("%d",&tLine);
     nTotal= (tLine*(tLine+1))>>1;
     for(i=1;i<nTotal;nline++)
