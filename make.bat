@@ -1,0 +1,1 @@
+mingw32-make && copy *.o obj && del *.o
