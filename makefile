@@ -1,7 +1,6 @@
 #Makefile start
 CC=gcc
-CP=copy
-RM=del
+
  
 CFLAGS_WARN = -Wall -g
  

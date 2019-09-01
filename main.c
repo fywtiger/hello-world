@@ -35,6 +35,12 @@ int main(int argc, char const *argv[])
             case '6':
                 DelOnePointFromList();
                 break;
+            case '7':
+                findMedianSortedArraysPrint();
+                break;
+            case '8':
+                Talgorithm();
+                break;
             case 'H':
             case 'h':
                 PrintMap();
@@ -54,15 +60,17 @@ int main(int argc, char const *argv[])
 void PrintMap()
 {
     printf("Wellcome! This is a function map:\n");
-    printf("  NO       Function Name           Action            \n");
-    printf("   1       TscanfDigital           Print out the number in the input string!\n");
-    printf("   2       TestCallback            Test callback function!\n");
-    printf("   3       PListPrint              Use list to print out the number in the input string!\n");
-    printf("   4       ChangeDigitalList       Print numbers in a pyramid!\n");
-    printf("   5       SequenceToConsequent    Converting an intermediate input to a sequential input!\n");
-    printf("   6       DelOnePointFromList     Del one Digital Point From Digital List!\n");
-    printf("   h       PrintMap                Print Function Map!\n");
-    printf("   q       Quitmain                Quit main Function!\n");
+    printf("  NO       Function Name                       Action            \n");
+    printf("   1       TscanfDigital                       Print out the number in the input string!\n");
+    printf("   2       TestCallback                        Test callback function!\n");
+    printf("   3       PListPrint                          Use list to print out the number in the input string!\n");
+    printf("   4       ChangeDigitalList                   Print numbers in a pyramid!\n");
+    printf("   5       SequenceToConsequent                Converting an intermediate input to a sequential input!\n");
+    printf("   6       DelOnePointFromList                 Del one Digital Point From Digital List!\n");
+    printf("   7       findMedianSortedArraysPrint         Get Median result from Two num list!\n");
+    printf("   8       Talgorithm                          Show some Classical Talgorithm!\n");
+    printf("   h       PrintMap                            Print Function Map!\n");
+    printf("   q       Quitmain                            Quit main Function!\n");
     return;
 }
 

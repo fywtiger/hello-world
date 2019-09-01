@@ -4,7 +4,6 @@
 #include <strings.h>
 #include "Mylib.h"
 
-
 int Talgorithm()
 {
     unsigned int number;
@@ -38,7 +37,6 @@ int Talgorithm()
     }
     free(numList);
     numList = NULL;
-
     return SUCCESS;
 }
 
@@ -526,4 +524,5 @@ double cal(double p1, char op, double p2)
 		case '/':
 		    return p2 / p1;
 	}    
+    return FAULT;
 }

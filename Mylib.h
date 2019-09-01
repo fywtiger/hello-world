@@ -8,7 +8,7 @@
 
 #define MAX 255
 #define SUCCESS 1
-#define FAULT 0
+#define FAULT -1
 #define TRUE 1
 #define FALSE 0
 
@@ -43,9 +43,6 @@ void Free_Memory(char *str);
 int scanfDigitalNumList(char *str);
 int PListPrint();
 int scanf_s(const char *restrict format, ...);
-//errno_t memcpy_s(void * restrict dest, rsize_t destsz, const void * restrict src, rsize_t count);
-//errno_t memset_s(void * dest, rsize_t destsz, int ch, rsize_t count);
-//errno_t strcat_s(char * restrict dest, rsize_t destsz, const char * restrict src);
 void SecurityTest();
 int postfix(char *infix,char *outPutCheck);
 int priority(char op);
@@ -61,6 +58,10 @@ void DelOnePointFromList();
 int StringToDigitalNum(char *str,unsigned int *dOutList,int *dOutListNum);
 void deleteNode(struct ListNode** node,unsigned int value);
 struct ListNode* deleteNode2(struct ListNode* node,unsigned int value);
+void findMedianSortedArraysPrint();
+double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size);
+int OutScanfDigitalNum(char *str,int *dOutList,int *dOutListLen);
+int insertNumToList(int iNum,int *numList,int numListLen);
 #endif
 
 

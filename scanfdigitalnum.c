@@ -4,9 +4,9 @@ typedef int (*C_scanfDigitalNum)(char *str);
 typedef int (*C_scanfDigitalString)(char *str);
 typedef struct ScanfDigitalClass
 {
-	C_scanfDigitalNum CscanfDigitalNum;	
+	C_scanfDigitalNum CscanfDigitalNum;
 	C_scanfDigitalString CscanfDigitalString;
-}C_ScanfDigital;
+} C_ScanfDigital;
 
 int TscanfDigital()
 {
@@ -14,19 +14,19 @@ int TscanfDigital()
 	C_scanfDigitalString CscanfDigitalString;
 	C_ScanfDigital CscanfDigita;
 
-	inputNumList = malloc(sizeof(char)*MAX);
-	
-	if(NULL == inputNumList)
+	inputNumList = malloc(sizeof(char) * MAX);
+
+	if (NULL == inputNumList)
 	{
 		printf("TscanfDigital malloc input memory is NULL\n");
 		return FAULT;
 	}
 	printf("Please input String list:\n");
-	scanf("%s",inputNumList);
+	scanf("%s", inputNumList);
 	//scanf("%s",inputNumList);
-	
+
 	CscanfDigita.CscanfDigitalNum = scanfDigitalNum;
-	if(FALSE == CscanfDigita.CscanfDigitalNum(inputNumList))
+	if (FALSE == CscanfDigita.CscanfDigitalNum(inputNumList))
 	{
 		printf("scanfDigitalNum is error!\n");
 		Free_Memory(inputNumList);
@@ -34,7 +34,7 @@ int TscanfDigital()
 	}
 
 	CscanfDigitalString = scanfDigitalString;
-	if(FALSE == CscanfDigitalString(inputNumList))
+	if (FALSE == CscanfDigitalString(inputNumList))
 	{
 		printf("scanfDigitalNum is error!\n");
 		Free_Memory(inputNumList);
@@ -46,24 +46,24 @@ int TscanfDigital()
 
 int scanfDigitalNum(char *str)
 {
-	unsigned int dOutList[MAX]={0};
-	unsigned int dOutListNum=0;
-	unsigned int dInputStrLen=0;
+	unsigned int dOutList[MAX] = {0};
+	unsigned int dOutListNum = 0;
+	unsigned int dInputStrLen = 0;
 	int dOutListDigitalFlag = FALSE;
 	int i;
-	int j=0;
-	if(NULL == str)
+	int j = 0;
+	if (NULL == str)
 	{
 		printf("scanfDigitalNum input point is NULL\n");
 		return FAULT;
 	}
 	dInputStrLen = strlen(str);
-	for(i=0;i<dInputStrLen;i++)
+	for (i = 0; i < dInputStrLen; i++)
 	{
-		if( *(str+i)>='0' && *(str+i)<='9')
+		if (*(str + i) >= '0' && *(str + i) <= '9')
 		{
-			dOutList[j]=dOutList[j]*10+*(str+i)-'0';
-			if(FALSE == dOutListDigitalFlag)
+			dOutList[j] = dOutList[j] * 10 + *(str + i) - '0';
+			if (FALSE == dOutListDigitalFlag)
 			{
 				dOutListNum++;
 			}
@@ -71,42 +71,42 @@ int scanfDigitalNum(char *str)
 		}
 		else
 		{
-			if(TRUE == dOutListDigitalFlag)
+			if (TRUE == dOutListDigitalFlag)
 			{
 				j++;
 			}
-			dOutListDigitalFlag = FALSE;			
-		}		
+			dOutListDigitalFlag = FALSE;
+		}
 	}
 
-	printf("ScanfDigitalNumList have %d Digital:\n",dOutListNum);
-	for(i=0;i<dOutListNum;i++)
+	printf("ScanfDigitalNumList have %d Digital:\n", dOutListNum);
+	for (i = 0; i < dOutListNum; i++)
 	{
-		printf("Digitala[%d]:%d\n",i,dOutList[i]);
+		printf("Digitala[%d]:%d\n", i, dOutList[i]);
 	}
 	return SUCCESS;
 }
 
 int scanfDigitalString(char *str)
 {
-	unsigned int dOutList[MAX]={0};
-	unsigned int dOutListNum=0;
-	unsigned int dInputStrLen=0;
+	unsigned int dOutList[MAX] = {0};
+	unsigned int dOutListNum = 0;
+	unsigned int dInputStrLen = 0;
 	int dOutListDigitalFlag = FALSE;
 	int i;
-	int j=0;
-	if(NULL == str)
+	int j = 0;
+	if (NULL == str)
 	{
 		printf("scanfDigitalNum input point is NULL\n");
 		return FAULT;
 	}
 	dInputStrLen = strlen(str);
-	for(i=0;i<dInputStrLen;i++)
+	for (i = 0; i < dInputStrLen; i++)
 	{
-		if( *(str+i)>='0' && *(str+i)<='9')
+		if (*(str + i) >= '0' && *(str + i) <= '9')
 		{
-			dOutList[j++]=*(str+i)-'0';
-			if(FALSE == dOutListDigitalFlag)
+			dOutList[j++] = *(str + i) - '0';
+			if (FALSE == dOutListDigitalFlag)
 			{
 				dOutListNum++;
 			}
@@ -114,43 +114,30 @@ int scanfDigitalString(char *str)
 		}
 		else
 		{
-			if(TRUE == dOutListDigitalFlag)
+			if (TRUE == dOutListDigitalFlag)
 			{
-				dOutList[j++]=' ';				
+				dOutList[j++] = ' ';
 			}
-			dOutListDigitalFlag = FALSE;			
-		}		
+			dOutListDigitalFlag = FALSE;
+		}
 	}
 
-	printf("ScanfDigitalNumList have %d DigitalString:\n",dOutListNum);
-	if(dOutListNum != 0)
+	printf("ScanfDigitalNumList have %d DigitalString:\n", dOutListNum);
+	if (dOutListNum != 0)
 	{
 		printf("DigitalaString[0]:");
 	}
-	for(i=0,dOutListNum=0;i<j;i++)
+	for (i = 0, dOutListNum = 0; i < j; i++)
 	{
-		if(' ' == dOutList[i])
+		if (' ' == dOutList[i])
 		{
-			printf("\nDigitalaString[%d]:",dOutListNum);
+			printf("\nDigitalaString[%d]:", dOutListNum);
 			dOutListNum++;
 		}
 		else
 		{
-			printf("%d",dOutList[i]);
-		}				
+			printf("%d", dOutList[i]);
+		}
 	}
 	return SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
