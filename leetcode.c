@@ -285,10 +285,58 @@ int insertNumToList(int iNum, int *numList, int numListLen)
 链接：https://leetcode-cn.com/problems/first-missing-positive
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
  *************************************************************************/
-
 int firstMissingPositive(int *nums, int numsSize)
 {
-    return SUCCESS;
+    int mixNumber=-1;
+    int i=0,j=0;
+    int *sortNum=NULL;
+    int maxValue=-1,maxValueSite=0,sortNumSize=0;
+
+    sortNum = malloc(sizeof(int)*numsSize);
+    memset(sortNum,0,sizeof(int)*numsSize);
+    sortNumSize = numsSize;
+    while (sortNumSize>0)
+    {
+		maxValue = -1;
+        for(i=0;i<numsSize;i++)
+        {            
+            if(nums[i]>maxValue)
+            {
+                maxValue = nums[i];
+                maxValueSite = i;
+            }
+        }
+
+        if(-1 == maxValue&&sortNumSize==numsSize)
+        {
+            free(sortNum);
+            return 1;
+        }
+        else if(maxValue>0)
+        {
+            nums[maxValueSite] = -1;
+            sortNum[j] = maxValue; 			        
+            j++;
+        }   
+		sortNumSize--;   		     
+    }	
+	if(sortNum[j-1]>1)
+	{
+		mixNumber = 1; 
+	}
+	else
+	{
+		for(i=j-1;i>1;i--)
+		{
+			if((sortNum[i-1]-sortNum[i])>1)
+			{
+				return (sortNum[i]+1);
+			}   
+		}
+		mixNumber = sortNum[0]+1;    
+	}    
+    free(sortNum);
+    return mixNumber;
 }
 
 /*********************************************************************
@@ -552,7 +600,7 @@ void taskRunTime()
     char tasks[MAX]={0};
     char input[MAX]={0};
     int i=0;
-    int taskSite=0,taskSize=0;
+    int taskSize=0;
     int j=0;
     int runTime;
     int frozenTime=0;
