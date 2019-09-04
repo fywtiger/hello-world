@@ -391,11 +391,9 @@ void gameOfLife(int** board, int boardSize, int* boardColSize)
 https://leetcode-cn.com/problems/brick-wall/
 行：wallSize  列：wallColSize
 *************************************************************************/
-
 int leastBricks(int** wall, int wallSize, int* wallColSize)
 {
-    int i=0,j=0;
-    int wallSizeEx=0;
+    int i=0,j=0;    
     int wallColSizeEx=0;
     int wallColSizeExAll=0;
     int **wallEx=NULL;
@@ -442,3 +440,190 @@ int leastBricks(int** wall, int wallSize, int* wallColSize)
     free(wallEx);
     return (wallSize - rNum);
 }
+/******************************************************************************************************************
+给定一个用字符数组表示的 CPU 需要执行的任务列表。其中包含使用大写的 A - Z 字母表示的26 种不同种类的任务。任务可以以任意顺序执行，
+并且每个任务都可以在 1 个单位时间内执行完。CPU 在任何一个单位时间内都可以执行一个任务，或者在待命状态。
+然而，两个相同种类的任务之间必须有长度为 n 的冷却时间，因此至少有连续 n 个单位时间内 CPU 在执行不同的任务，或者在待命状态。
+你需要计算完成所有任务所需要的最短时间。
+示例 1：
+输入: tasks = ["A","A","A","B","B","B"], n = 2
+输出: 8
+执行顺序: A -> B -> (待命) -> A -> B -> (待命) -> A -> B.
+注：
+任务的总个数为 [1, 10000]。
+n 的取值范围为 [0, 100]。
+链接：https://leetcode-cn.com/problems/task-scheduler
+结题思路:
+将无序的任务列表转换为一个相同任务的调度列表，然后按照任务的数量从大到小做排序，按照贪婪算法的结题思路，当间隔冷却为N的话，
+每次都把前面N+1个任务顺序调度了，每次调度后将对应类型的任务数减1，如果某种类型剩余的任务数已经为0，也需要填充一次rumtime，
+然后在重新做一次剩余统计队列的排序，直到所有的任务都被调度完毕，需要注意最后一次调度的时候N次循环是做不完的，需要将循环次数加入
+到runTime
+**********************************************************************************************************************/
+int leastInterval(char *tasks, int tasksSize, int n)
+{
+    int runTime=0;
+    int i=0;       
+    int TaskSumList[26]={0}; 
+    int taskListLen=0;
+    
+    taskListLen = ChangeTaskListToSum(tasks,tasksSize,TaskSumList);
+    
+    sortTaskList(TaskSumList,&taskListLen);
+
+    while(tasksSize>0)
+    {
+        for(i=0;i<=n;i++)
+        {
+            if(TaskSumList[i]>0)
+            {
+                TaskSumList[i]--;
+                tasksSize--;                               
+            }
+            if(0 != tasksSize)
+            {
+                runTime++;
+            }     
+            else
+            {
+                runTime = runTime+i+1;
+                return runTime;
+            }                           
+        }
+        sortTaskList(TaskSumList,&taskListLen);        
+    }
+    return runTime;
+}
+
+void sortTaskList(int *TaskList,int *taskListLen)
+{
+    int i=0, j=0, maxValue=0, maxSite=0;
+
+    for(j=0;j<*taskListLen;j++)
+    {
+        maxValue = 0;        
+        for(i=j;i<*taskListLen;i++)
+        {
+            if(TaskList[i]>maxValue)
+            {
+                maxValue = TaskList[i];
+                maxSite = i;
+            }
+        }
+        if(maxSite>j)//当TaskList剩余大于0的值小于n后，再循环到为0的时候，后面的值就不需要再排序，避免覆盖
+        {
+            TaskList[maxSite] = TaskList[j];
+            TaskList[j] = maxValue;
+        }
+    }
+    return;
+}
+/*将输入的调度任务列表转换为一个任务的统计列表，比如
+输入List:[ A A A B B B A D E C F Z F D C F X ] 
+转换为 sum List:[A:4 B:3 C:2 D:2 E:1 F:3 X:1 Z:1 ]:*/
+int ChangeTaskListToSum(char *tasks,int tasksSize ,int *TaskSumList)
+{
+    int TaskList[26]={0};  
+    int taskListLen=0;
+    int i,j;
+
+    for(i=0;i<tasksSize;i++)
+    {
+        j=tasks[i]-'A';
+        if(0==TaskList[j])
+        {
+            taskListLen++;
+        }
+        TaskList[j]++;        
+    }
+    
+    for(i=0,j=0;i<26;i++)
+    {
+        if(0!=TaskList[i])
+        {
+           TaskSumList[j] = TaskList[i];
+           j++;
+        }
+    }    
+    return taskListLen;
+}
+
+void taskRunTime()
+{
+    char tasks[MAX]={0};
+    char input[MAX]={0};
+    int i=0;
+    int taskSite=0,taskSize=0;
+    int j=0;
+    int runTime;
+    int frozenTime=0;
+    printf("Please input Tasks List:");
+    scanf("%s",input);
+    for(i=0;i<strlen(input);i++)
+    {
+        if(input[i]>='A'&&input[i]<='Z')
+        {
+            tasks[j] = input[i];
+            j++;
+            taskSize++;
+        }
+    }
+    printf("\ntasks[%d]:[",taskSize);
+    for(i=0;i<taskSize;i++)
+    {
+        if(i<taskSize-1)
+        {
+            printf("\"%c\",",tasks[i]);
+        }
+        else
+        {
+            printf("\"%c\"]",tasks[i]);
+        }
+    }
+    printf("\n");
+    printf("Please input Task Frozen Tinme:");
+    scanf("%d",&frozenTime);
+    runTime = leastInterval(tasks,taskSize,frozenTime);
+    printf("Task List Mix Run Time:%d when frozenTime is %d",runTime,frozenTime);
+}
+/* C++实现
+class Solution {
+public:
+    int leastInterval(vector<char>& tasks, int n) 
+    {
+        if(tasks.size()==0) 
+        {
+            return 0;
+        }
+        //统计各个任务的次数
+        int hash[26]={0}, tasksSize = tasks.size();
+        for (auto task : tasks)
+        {
+            hash[task - 'A'] += 1;
+        }
+        //寻找次数最多的任务maxTaskCnt，maxTasks记录次数最多的任务的个数
+        int maxTaskCnt = 0, maxTasks = 0;
+        for(int i = 0; i < 26; ++i)
+        {
+            if(hash[i] > maxTaskCnt) 
+            {
+                maxTaskCnt = hash[i];
+                maxTasks = 1;
+            }
+            else if(hash[i] == maxTaskCnt)
+            {
+                maxTasks++;
+            }
+        }
+        //计算需要的最大时间
+        int a = tasksSize - maxTaskCnt - maxTasks + 1;//需要插入的个数
+        int b = n * (maxTaskCnt - 1);//可插入利用的最大个数
+        if(a < b) 
+        {//第一种情况，贪心策略，尽量插入间隔
+            return (n + 1) * (maxTaskCnt - 1) + maxTasks;
+        }
+        else {//第二种情况，只要不让相同的任务的距离小于n即可
+            return tasksSize;
+        }
+    }
+};
+*/

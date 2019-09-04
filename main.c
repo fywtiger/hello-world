@@ -41,6 +41,13 @@ int main(int argc, char const *argv[])
             case '8':
                 Talgorithm();
                 break;
+            case '9':
+                PreTreeCreatAndOrder();
+                break;
+            case 'a':
+            case 'A':
+                taskRunTime();
+                break;
             case 'H':
             case 'h':
                 PrintMap();
@@ -69,6 +76,8 @@ void PrintMap()
     printf("   6       DelOnePointFromList                 Del one Digital Point From Digital List!\n");
     printf("   7       findMedianSortedArraysPrint         Get Median result from Two num list!\n");
     printf("   8       Talgorithm                          Show some Classical Talgorithm!\n");
+    printf("   9       PreTreeCreatAndOrder                Create a Pretree and print the Pretree!\n");
+    printf("   a       taskRunTime                         Get the Run Time of one Task List!\n");
     printf("   h       PrintMap                            Print Function Map!\n");
     printf("   q       Quitmain                            Quit main Function!\n");
     return;

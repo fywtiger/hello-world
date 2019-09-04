@@ -30,6 +30,14 @@ struct ListNode
     unsigned int val;
     struct ListNode *next;
  };
+typedef int ElementType;
+struct bitnode
+{
+	ElementType data;
+	struct bitnode *left, *right;
+};
+
+typedef struct bitnode *bitree;
 
 int scanfDigitalNum(char *str);
 int scanfDigitalString(char *str);
@@ -61,7 +69,20 @@ struct ListNode* deleteNode2(struct ListNode* node,unsigned int value);
 void findMedianSortedArraysPrint();
 double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size);
 int OutScanfDigitalNum(char *str,int *dOutList,int *dOutListLen);
-int insertNumToList(int iNum,int *numList,int numListLen);
+int insertNumToList(int iNum,int *numList,int numListLen); 
+ 
+struct bitnode* PerOrderCreateTree();
+void PerOrderTravel(bitree T);
+void InOrderTravel(bitree T);
+void TailOrderTravel(bitree T);
+bitree FreeTree(bitree T);
+void PreTreeCreatAndOrder();
+bitree InOrderCreateTree();
+
+int leastInterval(char *tasks, int tasksSize, int n);
+void sortTaskList(int *TaskList,int *taskListLen);
+void taskRunTime();
+int ChangeTaskListToSum(char *tasks,int tasksSize ,int *TaskSumList);
 #endif
 
 

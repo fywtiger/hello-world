@@ -39,7 +39,49 @@ int Talgorithm()
     numList = NULL;
     return SUCCESS;
 }
+/**********************************************************************
+ * 函数功能：将中序的算式转换为一个前序的算式，并输出前序算式的结果以及每步变换的过程，
+ * 然后再讲转换后的前序式的计算机计算过程和结果打印出来
+ * 作   者：范亚伟
+ * 示   例:
+please input infix:
+(8*7-6/3)/2+(2*4+6)/7
+Get out postfix:
+87*63/-2/24*6+7/+                                       
+OP    STACK  OUT
+  (     (      NULL
+  8     (      8
+  *     *(     8
+  7     *(     87
+  -     -(     87*
+  6     -(     87*6
+  /     /-(    87*6
+  3     /-(    87*63
+  )     NULL   87*63/-
+  /     /      87*63/-
+  2     /      87*63/-2
+  +     +      87*63/-2/
+  (     (+     87*63/-2/
+  2     (+     87*63/-2/2
+  *     *(+    87*63/-2/2
+  4     *(+    87*63/-2/24
+  +     +(+    87*63/-2/24*
+  6     +(+    87*63/-2/24*6
+  )     +      87*63/-2/24*6+
+  /     /+     87*63/-2/24*6+
+  7     /+     87*63/-2/24*6+7
+  NULL  NULL   87*63/-2/24*6+7/+
 
+stack[2]:7.000000 stack[1]:8.000000 new stack[1]:56.000000
+stack[3]:3.000000 stack[2]:6.000000 new stack[2]:2.000000
+stack[2]:2.000000 stack[1]:56.000000 new stack[1]:54.000000
+stack[2]:2.000000 stack[1]:54.000000 new stack[1]:27.000000
+stack[3]:4.000000 stack[2]:2.000000 new stack[2]:8.000000
+stack[3]:6.000000 stack[2]:8.000000 new stack[2]:14.000000
+stack[3]:7.000000 stack[2]:14.000000 new stack[2]:2.000000
+stack[2]:2.000000 stack[1]:27.000000 new stack[1]:29.000000
+postfix:"87*63/-2/24*6+7/+" Calculation result is 29.000000,
+**********************************************************************/
 void SequenceToConsequent()
 {
     int i=0,j=0;    
@@ -473,7 +515,19 @@ void debugPostfixPrintLine(char *op,char *stack,int stackStart,char *out,int out
     }    
     return;
 }
-
+/**********************************************************************
+运算时由后序式的前方开始读取，遇到运算元先存入堆叠，如果遇到运算子，则由堆叠中取出两个运算元进行对应的运算，
+然后将结果存回堆叠，如果运算式读取完毕，那么堆叠顶的值就是答案了， 例如我们计算
+12+34+*这个运算式（也就是(1+2)*(3+4)）： 读取堆叠
+op  stack
+1   1
+2   2 1
++   3 // 1+2 后存回
+3   3 3
+4   4 3 3
++   7 3 // 3+4 后存回
+*   21 // 3 * 7 后存回
+**********************************************************************/
 double evalPf(char* postfix) 
 {
     double stack[80] = {0.0};
@@ -525,4 +579,153 @@ double cal(double p1, char op, double p2)
 		    return p2 / p1;
 	}    
     return FAULT;
+}
+
+/**********************************************************************
+二叉树的创建，遍历。输入：1,2,3,4,0,5,6,7,8,9,0,0,0,0,0,0,0,10,0,0
+Check the PreTree in the following order:1 2 3 4 5 6 7 8 9 10
+Check the InOrderTree in the following order:4 7 9 8 6 5 3 2 1 10
+Check the TailOrderTree in the following order:9 8 7 6 5 4 3 2 10 1
+树形
+                                        1
+                                       /  \
+                                      2    10
+                                     / \    |  \
+                                    3 NULL NULL NULL
+                                   / \
+                                  4  NULL
+                                 / \
+                              NULL  5
+                                   / \
+                                  6  NULL
+                                 / \
+                                7   NULL
+                               / \
+                            NULL  8
+                                 / \
+                                9  NULL
+                               / \
+                            NULL  NULL           
+**********************************************************************/
+//先序创建一棵二叉树  
+bitree PerOrderCreateTree()
+{
+    bitree T; 
+    ElementType item;
+	scanf("%d",&item);
+	if( item == 0 )              //叶节点数据标志：其后根两个0 
+	    T = NULL;            //若某一节点为叶子结点，则其左右子树均为NULL，0表示建空树
+	else
+	{
+		T = (struct bitnode*)malloc(sizeof(struct bitnode));
+		T->data = item;
+		T->left = PerOrderCreateTree();             //递归创建其左子树 
+		T->right = PerOrderCreateTree();            //递归创建其右子树 
+	} 	
+	return T;
+}
+
+//中序创建一棵二叉树  
+bitree InOrderCreateTree()
+{
+    bitree T; 
+    ElementType item;
+	scanf("%d",&item);
+	if( item == 0 )              //叶节点数据标志：其后根两个0 
+	    T = NULL;            //若某一节点为叶子结点，则其左右子树均为NULL，0表示建空树
+	else
+	{
+		T = (struct bitnode*)malloc(sizeof(struct bitnode));		
+		T->left = InOrderCreateTree();             //递归创建其左子树         
+        T->data = item;
+		T->right = InOrderCreateTree();            //递归创建其右子树 
+	} 	
+	return T;
+}
+
+//后序创建一棵二叉树  
+bitree TailOrderCreateTree()
+{
+    bitree T; 
+    ElementType item;
+	scanf("%d",&item);
+	if( item == 0 )              //叶节点数据标志：其后根两个0 
+	    T = NULL;            //若某一节点为叶子结点，则其左右子树均为NULL，0表示建空树
+	else
+	{
+		T = (struct bitnode*)malloc(sizeof(struct bitnode));		
+		T->left = TailOrderCreateTree();             //递归创建其左子树         
+		T->right = TailOrderCreateTree();            //递归创建其右子树 
+        T->data = item;
+	} 	
+	return T;
+}
+
+//先序递归周游二叉树
+void PerOrderTravel(bitree T)
+{
+	if( NULL!=T )            // T != NULL 
+	{
+		printf("%d ",T->data);
+		PerOrderTravel(T->left);            //递归先序周游其左子树 
+		PerOrderTravel(T->right);           //递归先序周游其右子树 
+	}
+} 
+
+/**中序遍历 左根右**/
+void InOrderTravel(bitree T)
+{
+    if(T==NULL)
+        return;
+    InOrderTravel(T->left);
+    printf("%d ",T->data);
+    InOrderTravel(T->right);
+}
+ 
+/**后序遍历 左右根**/
+void TailOrderTravel(bitree T)
+{
+    if(T==NULL)
+        return;
+    TailOrderTravel(T->left);
+    TailOrderTravel(T->right);
+    printf("%d ",T->data);
+} 
+//释放空间
+bitree FreeTree(bitree T)
+{
+	if( NULL!=T )
+	{
+		FreeTree(T->left);            //递归释放其左子树 
+		FreeTree(T->right);           //递归释放其右子树 
+		free(T);                      //释放根节点 
+		T = NULL;                     //释放指向根节点的指针 
+	}
+	
+	return T;           //返回释放后的根节点NULL 
+} 
+
+
+void PreTreeCreatAndOrder()
+{
+	bitree root;	
+	//printf("Please input a number to Create PreTree:");
+	//root = PerOrderCreateTree();               //先序创建一棵二叉树 	
+    printf("Please input a number to Create InOrderTree:");
+    root = InOrderCreateTree();    
+
+    printf("\n");
+	printf("Check the PreTree in the following order:"); 
+	PerOrderTravel(root);             //先序周游 	
+
+    printf("\n");
+    printf("Check the InOrderTree in the following order:"); 
+    InOrderTravel(root);
+
+    printf("\n");
+    printf("Check the TailOrderTree in the following order:"); 
+    TailOrderTravel(root);
+
+    FreeTree(root);
+	return ;
 }
