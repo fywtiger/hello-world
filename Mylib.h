@@ -85,6 +85,10 @@ void taskRunTime();
 int ChangeTaskListToSum(char *tasks,int tasksSize ,int *TaskSumList);
 
 int findJudge(int N, int** trust, int trustSize, int* trustColSize);
+
+int movesToMakeZigzag(int* nums, int numsSize);
+int TwoNumbers(int* nums);
+int MoreThreeNumbers(int* nums,int numsSize);
 #endif
 
 

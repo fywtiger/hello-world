@@ -641,48 +641,6 @@ void taskRunTime()
     runTime = leastInterval(tasks,taskSize,frozenTime);
     printf("Task List Mix Run Time:%d when frozenTime is %d",runTime,frozenTime);
 }
-/* C++实现
-class Solution {
-public:
-    int leastInterval(vector<char>& tasks, int n) 
-    {
-        if(tasks.size()==0) 
-        {
-            return 0;
-        }
-        //统计各个任务的次数
-        int hash[26]={0}, tasksSize = tasks.size();
-        for (auto task : tasks)
-        {
-            hash[task - 'A'] += 1;
-        }
-        //寻找次数最多的任务maxTaskCnt，maxTasks记录次数最多的任务的个数
-        int maxTaskCnt = 0, maxTasks = 0;
-        for(int i = 0; i < 26; ++i)
-        {
-            if(hash[i] > maxTaskCnt) 
-            {
-                maxTaskCnt = hash[i];
-                maxTasks = 1;
-            }
-            else if(hash[i] == maxTaskCnt)
-            {
-                maxTasks++;
-            }
-        }
-        //计算需要的最大时间
-        int a = tasksSize - maxTaskCnt - maxTasks + 1;//需要插入的个数
-        int b = n * (maxTaskCnt - 1);//可插入利用的最大个数
-        if(a < b) 
-        {//第一种情况，贪心策略，尽量插入间隔
-            return (n + 1) * (maxTaskCnt - 1) + maxTasks;
-        }
-        else {//第二种情况，只要不让相同的任务的距离小于n即可
-            return tasksSize;
-        }
-    }
-};
-*/
 /**********************************************************************************
 997:在一个小镇里，按从 1 到 N 标记了 N 个人。传言称，这些人中有一个是小镇上的秘密法官。
 如果小镇的法官真的存在，那么：
@@ -779,4 +737,118 @@ int findJudge(int N, int** trust, int trustSize, int* trustColSize)
     }
 
     return -1;
+}
+
+/**********************************************************************************
+1144:给你一个整数数组 nums，每次操作会从中选择一个元素并将该元素的值减少 1。
+如果符合下列情况之一，则数组 A 就是 锯齿数组：
+每个偶数索引对应的元素都大于相邻的元素，即 A[0] > A[1] < A[2] > A[3] < A[4] > ...
+或者，每个奇数索引对应的元素都大于相邻的元素，即 A[0] < A[1] > A[2] < A[3] > A[4] < ...
+返回将数组 nums 转换为锯齿数组所需的最小操作次数。
+示例 1：
+输入：nums = [1,2,3]
+输出：2
+解释：我们可以把 2 递减到 0，或把 3 递减到 1。
+示例 2：
+输入：nums = [9,6,1,6,2]
+输出：4
+提示：
+1 <= nums.length <= 1000
+1 <= nums[i] <= 1000
+链接：https://leetcode-cn.com/problems/decrease-elements-to-make-array-zigzag
+解题：
+**********************************************************************************/
+int movesToMakeZigzag(int* nums, int numsSize)
+{
+    int operationStep=-1;    
+    switch (numsSize)
+    {
+        case 1:
+            operationStep = 0;
+            break;
+        case 2:
+            operationStep = TwoNumbers(nums);
+            break;
+        default:
+            operationStep = MoreThreeNumbers(nums,numsSize);
+            break;        
+    }    
+    return operationStep;
+}
+
+int TwoNumbers(int* nums)
+{
+    if(nums[0]==nums[1])
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int MoreThreeNumbers(int* nums,int numsSize)
+{
+    int i=0;
+    int operationStep1 = 0;
+    int operationStep2 = 0;
+    int flag = 1;
+    int numList[1001]={0};
+    
+    memcpy(numList,nums,sizeof(int)*numsSize);    
+    
+    for(i=0;i<numsSize-1;i=i+2)
+    {
+        flag = 1;
+        while(flag)
+        {
+            if(numList[i+1]<=numList[i])
+            {
+                operationStep2++;
+                //printf("11111 numLise[%d]:%d<numList[%d]:%d\n",i+1,numList[i+1],i,numList[i]);
+                numList[i]--;
+                
+            }
+            else if(numList[i+1]<=numList[i+2])
+            {
+                operationStep2++;                
+                //printf("22222 numLise[%d]:%d<numList[%d]:%d\n",i+1,numList[i+1],i+2,numList[i+2]);
+                numList[i+2]--;
+            }
+            else 
+            {
+                flag = 0;
+            }
+        }
+    }
+
+    memcpy(numList,nums,numsSize);
+    numList[numsSize+1]=1001;
+    
+    for(i=0;i<numsSize-1;i=i+2)
+    {
+        flag = 1;
+        while(flag)
+        {
+            if(numList[i+1]>=numList[i])
+            {
+                operationStep1++;                
+                //printf("33333 numLise[%d]:%d>numList[%d]:%d\n",i+1,numList[i+1],i,numList[i]);
+                numList[i+1]--;
+            }
+            else if(numList[i+1]>=numList[i+2])
+            {
+                operationStep1++;                
+                //printf("44444 numLise[%d]:%d>numList[%d]:%d\n",i+1,numList[i+1],i+2,numList[i+2]);
+                numList[i+1]--;
+            }
+            else 
+            {
+                flag = 0;
+            }
+        }
+    }
+    printf("operationStep1:%d operationStep2:%d\n",operationStep1,operationStep2);
+    return (operationStep1<operationStep2?operationStep1:operationStep2);       
 }
