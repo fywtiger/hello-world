@@ -83,6 +83,8 @@ int leastInterval(char *tasks, int tasksSize, int n);
 void sortTaskList(int *TaskList,int *taskListLen);
 void taskRunTime();
 int ChangeTaskListToSum(char *tasks,int tasksSize ,int *TaskSumList);
+
+int findJudge(int N, int** trust, int trustSize, int* trustColSize);
 #endif
 
 
