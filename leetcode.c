@@ -823,7 +823,7 @@ int MoreThreeNumbers(int* nums,int numsSize)
         }
     }
 
-    memcpy(numList,nums,numsSize);
+    memcpy(numList,nums,sizeof(int)*numsSize);
     numList[numsSize+1]=1001;
     
     for(i=0;i<numsSize-1;i=i+2)
