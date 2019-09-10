@@ -239,14 +239,14 @@ void deleteNode(struct ListNode** node,unsigned int value)
         {
             nodeHead = nodeHead->next;
             *node = nodeHead;
-            free(nodePre);            
+            //free(nodePre);            
             nodeList = nodeHead;
         }
 
         if(nodeList->val == value)
         {
             nodePre->next = nodeList->next;
-            free(nodeList); 
+            //free(nodeList); 
             nodeList = nodePre->next;
         }
         else
