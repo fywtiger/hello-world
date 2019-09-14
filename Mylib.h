@@ -39,6 +39,26 @@ struct bitnode
 
 typedef struct bitnode *bitree;
 
+#define MAX_PEOPLE 1100
+typedef struct node
+{
+    int height;
+    int sortSite[MAX_PEOPLE];
+}NODE_PEOPLE;
+struct nodeList
+{
+    int height;
+    int site;
+    struct nodeList *next;    
+};
+typedef struct nodeList *NODE_LIST;
+struct resultList
+{
+    int count;
+    int value;
+};
+typedef struct resultList Result_List;
+
 int scanfDigitalNum(char *str);
 int scanfDigitalString(char *str);
 void TestCallback(int (*test)());
@@ -89,6 +109,15 @@ int findJudge(int N, int** trust, int trustSize, int* trustColSize);
 int movesToMakeZigzag(int* nums, int numsSize);
 int TwoNumbers(int* nums);
 int MoreThreeNumbers(int* nums,int numsSize);
+
+NODE_PEOPLE* SortQueueList(int** people, int peopleSize,int *nodeListLen);
+void printList(NODE_LIST head);
+NODE_LIST insertNodeList(int nodeListLen,NODE_PEOPLE* peopleList);
+int** reconstructQueue1(int** people, int peopleSize, int* peopleColSize, int* returnSize, int** returnColumnSizes);
+int** SortQueueList1(int** people, int peopleSize,int* peopleColSize);
+NODE_LIST insertNodeList1(int **SortPeople, int peopleSize);
+int insertOneToResultList(Result_List *resultList,int value,int listLen);
+int queryMaxCountFromList(Result_List *resultList,int listLen);
 #endif
 
 

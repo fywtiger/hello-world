@@ -420,7 +420,6 @@ void gameOfLife(int** board, int boardSize, int* boardColSize)
     free(boardEx);
     return;
 }
-
 /*********************************************************************
 554：你的面前有一堵方形的、由多行砖块组成的砖墙。 这些砖块高度相同但是宽度不同。你现在要画一条自顶向下的、穿过最少砖块的垂线。
 砖墙由行的列表表示。 每一行都是一个代表从左至右每块砖的宽度的整数列表。
@@ -449,52 +448,67 @@ https://leetcode-cn.com/problems/brick-wall/
 *************************************************************************/
 int leastBricks(int** wall, int wallSize, int* wallColSize)
 {
-    int i=0,j=0;    
+    int i=0,j=0,insertResult=0;    
     int wallColSizeEx=0;
-    int wallColSizeExAll=0;
-    int **wallEx=NULL;
-    int rNum=0;
-    //int *result;
-    int result[10000]={0};
+    int wallColSizeExAll=0;     
+    Result_List resultList[20000]={0};
+    int listLen = 0;
+    int maxCount = 0;    
     
-    wallEx = (int **)malloc(sizeof(int *)*wallSize);    
-    for(j=0;j<wallColSize[0];j++)
+    for(i=0;i<wallColSize[0];i++)
     {
-        wallColSizeExAll = wallColSizeExAll + wall[0][j];
+        wallColSizeExAll = wallColSizeExAll + wall[0][i];
     }
     
     for(i=0;i<wallSize;i++)
-    {
-        wallEx[i] = (int *)malloc(sizeof(int) * wallColSizeExAll);        
-        memset(wallEx[i],0,sizeof(int) * wallColSizeExAll);        
+    {              
         wallColSizeEx=0;        
         for(j=0;j<wallColSize[i];j++)
         {
             wallColSizeEx = wallColSizeEx + wall[i][j];            
-            wallEx[i][wallColSizeEx-1] = 1;                     
+            if(0!=wallColSizeEx && wallColSizeEx!=wallColSizeExAll) 
+            {
+                insertResult = insertOneToResultList(resultList,wallColSizeEx,listLen);
+                listLen = listLen + insertResult;                
+            }               
         }
     }
-    
-    //result = malloc(sizeof(int) * wallColSizeExAll);    
-    for(j=0;j<(wallColSizeExAll-1);j++)
+    maxCount = queryMaxCountFromList(resultList,listLen);  
+    return (wallSize - maxCount);
+}
+/******************************************************************************************************
+ 以每一行每一堆砖块的宽度作为键值建表，如果存在则count+1，不存在就插入一个，暂时不优化算法，插入时遍历全表
+ ******************************************************************************************************/
+int insertOneToResultList(Result_List *resultList,int value,int listLen)
+{
+    int i=0;    
+    for(i=0;i<listLen;i++)
     {
-        //result[j] = 0;
-        for(i=0;i<wallSize;i++)
+        if(value == resultList[i].value)
         {
-            result[j] = result[j] + wallEx[i][j];
+            resultList[i].count++;
+            return 0;
         }
-        if(result[j]>rNum)
-        {
-            rNum = result[j];
-        }
-    }     
-
-    for(i=0;i<wallSize;i++)
-    {
-        free(wallEx[i]);
     }
-    free(wallEx);
-    return (wallSize - rNum);
+    resultList[listLen].value = value;
+    resultList[listLen].count = 1;
+    return 1;
+}
+/******************************************************************************************************
+ 查询链表中count值最大的结果返回，此处就是砖缝最多的点，用行号减去该值就是最小需要穿透的墙的行数
+ ******************************************************************************************************/
+int queryMaxCountFromList(Result_List *resultList,int listLen)
+{
+    int i=0;
+    int maxCount=0;
+    for(i=0;i<listLen;i++)
+    {
+        if(maxCount<resultList[i].count)
+        {
+            maxCount = resultList[i].count;
+        }
+    }
+    return maxCount;
 }
 /******************************************************************************************************************
 621：给定一个用字符数组表示的 CPU 需要执行的任务列表。其中包含使用大写的 A - Z 字母表示的26 种不同种类的任务。任务可以以任意顺序执行，
@@ -519,7 +533,7 @@ int leastInterval(char *tasks, int tasksSize, int n)
 {
     int runTime=0;
     int i=0;       
-    int TaskSumList[26]={0}; 
+    int TaskSumList[101]={0}; 
     int taskListLen=0;
     
     taskListLen = ChangeTaskListToSum(tasks,tasksSize,TaskSumList);
@@ -533,17 +547,13 @@ int leastInterval(char *tasks, int tasksSize, int n)
             if(TaskSumList[i]>0)
             {
                 TaskSumList[i]--;
-                tasksSize--;                               
+                tasksSize--;  
+                runTime++;                             
             }
-            if(0 != tasksSize)
+            else if(0 != tasksSize)
             {
                 runTime++;
-            }     
-            else
-            {
-                runTime = runTime+i+1;
-                return runTime;
-            }                           
+            }                                      
         }
         sortTaskList(TaskSumList,&taskListLen);        
     }
@@ -552,24 +562,19 @@ int leastInterval(char *tasks, int tasksSize, int n)
 
 void sortTaskList(int *TaskList,int *taskListLen)
 {
-    int i=0, j=0, maxValue=0, maxSite=0;
+    int i=0, j=0, maxValue=0;
 
-    for(j=0;j<*taskListLen;j++)
-    {
-        maxValue = 0;        
-        for(i=j;i<*taskListLen;i++)
+    for(j=0;j<*taskListLen-1;j++)    
+    {           
+        for(i=j+1;i<*taskListLen;i++)
         {
-            if(TaskList[i]>maxValue)
+            if(TaskList[j]<TaskList[i])
             {
                 maxValue = TaskList[i];
-                maxSite = i;
+                TaskList[i] = TaskList[j];
+                TaskList[j] = maxValue;
             }
-        }
-        if(maxSite>j)//当TaskList剩余大于0的值小于n后，再循环到为0的时候，后面的值就不需要再排序，避免覆盖
-        {
-            TaskList[maxSite] = TaskList[j];
-            TaskList[j] = maxValue;
-        }
+        }        
     }
     return;
 }
@@ -677,25 +682,23 @@ trust[i][0] != trust[i][1]
 **********************************************************************************/
 int findJudge(int N, int** trust, int trustSize, int* trustColSize)
 {
-    int i=0,j=0,len=1;
+    int i=0,j=0,len=0;
     int trustList[1001][1001]={0};    
     int line=0,col=0;
     int *trustNum,trustNumSite=0,trustValue=0;
 
-    trustNum = malloc(sizeof(int)*N);
-    if(NULL == trustNum)
+    if(1==N)
     {
-        printf("findJudge malloc trustNum memory Error!\n");
-        return -1;
+        return 1;
     }
+    trustNum = malloc(sizeof(int)*N);   
     memset(trustNum,0,sizeof(int)*N);
     for(i=0;i<trustSize;i++)
     {
         line = trust[i][0];
         col = trust[i][1];
-        trustList[line][col] = 1;
-        //printf("intial trustList[%d][%d]:%d\n",line,col,trustList[line][col]);
-        for(j=0;j<len;j++)
+        trustList[line][col] = 1;        
+        for(j=0;j<N;j++)
         {
             if(0 == trustNum[j])
             {
@@ -709,9 +712,10 @@ int findJudge(int N, int** trust, int trustSize, int* trustColSize)
             }       
         }
     }    
-    if(len < N)
+   
+    if(len < N-1)
     {
-        free(trustNum);
+        free(trustNum);        
         return -1;
     }
     else
@@ -722,9 +726,10 @@ int findJudge(int N, int** trust, int trustSize, int* trustColSize)
             if(0 != trustList[trustNumSite][i])     
             {
                 trustValue = 1;
-                for(j=0;j<len-1;j++)
+                for(j=0;j<len;j++)
                 {
-                    trustNumSite=trustNum[i];                    
+                    
+                    trustNumSite=trustNum[j];        
                     trustValue = trustValue & trustList[trustNumSite][i];
                 }
                 if(1==trustValue)
@@ -794,7 +799,7 @@ int MoreThreeNumbers(int* nums,int numsSize)
     int operationStep1 = 0;
     int operationStep2 = 0;
     int flag = 1;
-    int numList[1001]={0};
+    int numList[1002]={0};
     
     memcpy(numList,nums,sizeof(int)*numsSize);    
     
@@ -823,8 +828,8 @@ int MoreThreeNumbers(int* nums,int numsSize)
         }
     }
 
-    memcpy(numList,nums,sizeof(int)*numsSize);  
-    numList[numsSize+1]=1001;
+    memcpy(numList,nums,sizeof(int)*numsSize);
+    numList[numsSize]=1001;
     
     for(i=0;i<numsSize-1;i=i+2)
     {
@@ -851,4 +856,289 @@ int MoreThreeNumbers(int* nums,int numsSize)
     }
     printf("operationStep1:%d operationStep2:%d\n",operationStep1,operationStep2);
     return (operationStep1<operationStep2?operationStep1:operationStep2);       
+}
+/*************************************************************************************************
+leetcode:406 假设有打乱顺序的一群人站成一个队列。 每个人由一个整数对(h, k)表示，其中h是这个人的身高，k是排在这个人前面且身高大于
+或等于h的人数。 编写一个算法来重建这个队列。注意：总人数少于1100人。示例
+输入:
+[[7,0], [4,4], [7,1], [5,0], [6,1], [5,2]]
+输出:
+[[5,0], [7,0], [5,2], [6,1], [4,4], [7,1]]
+链接：https://leetcode-cn.com/problems/queue-reconstruction-by-height
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ *************************************************************************************************/
+
+int** reconstructQueue(int** people, int peopleSize, int* peopleColSize, int* returnSize, int** returnColumnSizes)
+{
+    NODE_PEOPLE* peopleList = NULL;
+    int i=0,nodeListLen=0;
+    NODE_LIST head=NULL,now=NULL;
+    int** returnList=NULL;
+
+    peopleList = SortQueueList(people,peopleSize,&nodeListLen);    
+    #ifdef DEBUG 
+    printf("nodeListLen is %d \n",nodeListLen);
+    for(i=0;i<nodeListLen;i++)
+    {
+        printf("peopleList[%d].height:%d\n",i,peopleList[i].height);
+        printf("peopleList[%d].sortSite:",i);
+        for(j=0;j<MAX_PEOPLE;j++)
+        {
+            if(peopleList[i].sortSite[j] == 1)
+            {
+                printf("%d ",j);
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+    #endif
+    head = insertNodeList(nodeListLen,peopleList);
+
+    *returnSize = peopleSize;       
+    returnList = (int **)malloc(sizeof(int *)*peopleSize);
+    *returnColumnSizes = (int *)malloc(sizeof(int)*peopleSize);
+    for(i=0;i<peopleSize;i++)
+    {
+        returnList[i] = (int *)malloc(sizeof(int)*peopleColSize[i]);
+        (*returnColumnSizes)[i]=peopleColSize[i];        
+    }   
+    now = head;
+    printf("returnList:");
+    while(NULL != now)
+    {
+        returnList[i][0] = now->height;
+        returnList[i][1] = now->site;
+        printf("[%d,%d] ",returnList[i][0],returnList[i][1]);
+        i++;
+        now = now->next;
+        free(head);
+        head = now;        
+    }
+    printf("\n");
+    free(peopleList);   
+    return returnList;    
+}
+
+void printList(NODE_LIST head)
+{
+    printf("List:");
+    while(NULL != head)
+    {
+        printf("[%d,%d] ",head->height,head->site);
+        head = head->next;
+    }
+    printf("\n");
+}
+/*将people输入的数据按照身高从高到低排序，在每个排序的结构中sortSize表示people中出现的该身高的大于等于自己的值
+nodeListLen表示peopleList数组的长度，相同身高被合并到一个数组结构中*/
+NODE_PEOPLE* SortQueueList(int** people, int peopleSize, int *nodeListLen)
+{
+    NODE_PEOPLE* peopleList = NULL;
+    NODE_PEOPLE temp;
+    int i=0,j=0;
+    int nodeHeight=0,sortSite=0;
+    peopleList =(NODE_PEOPLE*) malloc(sizeof(NODE_PEOPLE)*peopleSize);
+    memset(peopleList,-1,sizeof(NODE_PEOPLE)*peopleSize);
+    *nodeListLen = 0;
+    for(i=0;i<peopleSize;i++)
+    {
+        nodeHeight = people[i][0];
+        sortSite = people[i][1]; 
+        for(j=0;j<peopleSize;j++)       
+        {
+            if(-1==peopleList[j].height)
+            {
+                peopleList[j].height = nodeHeight;
+                peopleList[j].sortSite[sortSite] = 1;
+                *nodeListLen = *nodeListLen+1;
+                break;
+            }
+            else
+            {
+                if(nodeHeight == peopleList[j].height)
+                {
+                    peopleList[j].sortSite[sortSite] = 1;
+                    break;
+                }     
+            }
+        }
+    }      
+    for(i=0;i<(*nodeListLen-1);i++)
+    {
+        for(j=i+1;j<*nodeListLen;j++)
+        {
+            if(peopleList[i].height<peopleList[j].height)
+            {
+                memcpy(&temp,&peopleList[i],sizeof(NODE_PEOPLE));
+                memcpy(&peopleList[i],&peopleList[j],sizeof(NODE_PEOPLE));
+                memcpy(&peopleList[j],&temp,sizeof(NODE_PEOPLE));
+            }
+        }
+    }
+  
+    return peopleList;
+}
+
+NODE_LIST insertNodeList(int nodeListLen,NODE_PEOPLE* peopleList)
+{
+    NODE_LIST head=NULL,peopleNode=NULL,insertSite=NULL,next=NULL;
+    int i,j,z=0,heightSite=0;
+    for(i=0;i<nodeListLen;i++)
+    {              
+        for(j=0;j<MAX_PEOPLE;j++)
+        {
+            if(peopleList[i].sortSite[j] == 1)
+            {                
+                peopleNode = malloc(sizeof(struct nodeList));                    
+                peopleNode->height = peopleList[i].height;
+                peopleNode->site = j;
+                heightSite = peopleNode->site;
+                peopleNode->next = NULL;
+                if(0==heightSite)     
+                {
+                    next = head;
+                    head = peopleNode;
+                    head->next = next;   
+                    printf("---------------%d----------------\n",z++);                     
+                }         
+                else
+                {
+                    insertSite = head;
+                    while(heightSite>1)
+                    {
+                        insertSite=insertSite->next;
+                        heightSite--;
+                    }
+                    next = insertSite->next;
+                    insertSite->next = peopleNode;
+                    peopleNode->next = next;
+                    printf("---------------%d----------------\n",z++);
+                }               
+                printList(head);
+            }
+        }        
+    }
+    return head;
+}
+/*************************************************************************************************
+leetcode406解题优化：直接进行队列排序，不再转换结构
+ *************************************************************************************************/
+int** reconstructQueue1(int** people, int peopleSize, int* peopleColSize, int* returnSize, int** returnColumnSizes)
+{
+    int **SortPeople = NULL,**returnList = NULL;
+    NODE_LIST head=NULL,now=NULL;
+    int i=0;
+
+    SortPeople = SortQueueList1(people,peopleSize,peopleColSize);
+  
+    head = insertNodeList1(SortPeople,peopleSize);
+
+    *returnSize = peopleSize;       
+    returnList = (int **)malloc(sizeof(int *)*peopleSize);
+    *returnColumnSizes = (int *)malloc(sizeof(int)*peopleSize);
+    for(i=0;i<peopleSize;i++)
+    {
+        returnList[i] = (int *)malloc(sizeof(int)*peopleColSize[i]);
+        (*returnColumnSizes)[i]=peopleColSize[i];        
+    }   
+    i=0;
+    now = head;
+    printf("returnList:");
+    while(NULL != now)
+    {
+        returnList[i][0] = now->height;
+        returnList[i][1] = now->site;
+        printf("[%d,%d] ",returnList[i][0],returnList[i][1]);
+        i++;
+        now = now->next;
+        free(head);
+        head = now;        
+    }
+    printf("\n");
+    for(i=0;i<peopleSize;i++)
+    {
+        free(SortPeople[i]);
+    }
+    free(SortPeople);
+    return returnList;  
+
+}
+
+int** SortQueueList1(int** people, int peopleSize,int* peopleColSize)
+{
+    int **SortPeople = NULL;
+    int i=0,j=0;
+    int temp[2]={0};
+
+    SortPeople = (int **)malloc(sizeof(int *)*peopleSize);
+    for(i=0;i<peopleSize;i++)
+    {
+        SortPeople[i] = (int *)malloc(sizeof(int)*peopleColSize[i]);        
+        memcpy(SortPeople[i],people[i],peopleColSize[i]*sizeof(int));
+    }
+    
+    for(i=0;i<peopleSize-1;i++)
+    {
+        for(j=i+1;j<peopleSize;j++)
+        {
+            if(SortPeople[i][0]<SortPeople[j][0])
+            {
+                temp[0] = SortPeople[i][0];
+                temp[1] = SortPeople[i][1];
+                SortPeople[i][0] = SortPeople[j][0];
+                SortPeople[i][1] = SortPeople[j][1];
+                SortPeople[j][0] = temp[0];
+                SortPeople[j][1] = temp[1];
+            }
+            else if((SortPeople[i][0]==SortPeople[j][0])&&(SortPeople[i][1]>SortPeople[j][1]))
+            {
+                temp[0] = SortPeople[i][0];
+                temp[1] = SortPeople[i][1];
+                SortPeople[i][0] = SortPeople[j][0];
+                SortPeople[i][1] = SortPeople[j][1];
+                SortPeople[j][0] = temp[0];
+                SortPeople[j][1] = temp[1];
+            }            
+        }
+    }
+    return SortPeople;
+}
+
+NODE_LIST insertNodeList1(int **SortPeople, int peopleSize)
+{
+    NODE_LIST head=NULL,peopleNode=NULL,insertSite=NULL,next=NULL;
+    int i,z=0,heightSite=0;
+    for(i=0;i<peopleSize;i++)
+    {    
+        peopleNode = malloc(sizeof(struct nodeList));                    
+        peopleNode->height = SortPeople[i][0];
+        peopleNode->site = SortPeople[i][1];
+        heightSite = peopleNode->site;
+        peopleNode->next = NULL;
+        if(0==heightSite)     
+        {
+            next = head;
+            head = peopleNode;
+            head->next = next;   
+            printf("---------------%d----------------\n",z++);                     
+        }         
+        else
+        {
+            insertSite = head;
+            while(heightSite>1)
+            {
+                insertSite=insertSite->next;
+                heightSite--;
+            }
+            next = insertSite->next;
+            insertSite->next = peopleNode;
+            peopleNode->next = next;
+            printf("---------------%d----------------\n",z++);
+        }               
+        printList(head);
+    }
+    return head;
 }

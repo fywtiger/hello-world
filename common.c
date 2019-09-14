@@ -2,7 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-
+struct common
+{
+	int a;
+	int b;
+};
+typedef struct common COMMON;
 void Free_Memory(char *str)
 {
 	if(NULL == str)
@@ -15,50 +20,32 @@ void Free_Memory(char *str)
 	return;
 }
 #if 0
-int main(int argc, char const *argv[])
-{
-	int TaskList[8]={0};
-	int taskListLen = 8;
-	int i;
-	TaskList[0] = 1;
+void strlong(int **str1,int **str2)
+{	
+	*str1 = malloc(sizeof(int)*3);	
+	(*str1)[0] = 1;
+	(*str1)[1] = 10;
+	(*str1)[2] = 100;
 
-	printf("before sort tasks sum List:[");
-	for(i=0;i<taskListLen;i++)
-	{
-		printf("%c:%d ",(i+'A'),TaskList[i]);
-	}
-	printf("]\n");
-	sortTaskList(TaskList,&taskListLen);
-	printf("after sort tasks sum List:[");
-	for(i=0;i<taskListLen;i++)
-	{
-		printf("%c:%d ",(i+'A'),TaskList[i]);
-	}
-	printf("]\n");
-	return 0;
+	*str2 = malloc(sizeof(int));
+	str2[0][0] = 2;
+	*(str2[1]) = 20;
+	str2[0][2] = 200;
 }
-
-void sortTaskList(int *TaskList,int *taskListLen)
-{
-    int i=0, j=0, maxValue=0, maxSite=0;
-
-    for(j=0;j<*taskListLen;j++)
-    {
-        maxValue = 0;        
-        for(i=j;i<*taskListLen;i++)
-        {
-            if(TaskList[i]>maxValue)
-            {
-                maxValue = TaskList[i];
-                maxSite = i;
-				printf("loop[%d][%d] maxValue:%d maxSite:%d\n",j,i,maxValue,maxSite);
-            }
-        }
-        TaskList[maxSite] = TaskList[j];
-        TaskList[j] = maxValue;
-
-		printf("loop[%d][%d] TaskList[%d]:%d value:%d\n",j,i,maxSite,TaskList[maxSite],TaskList[j]);
-    }
-    return;
+int main()
+{    	
+	int **str1 = NULL;
+	int **str2 = NULL;
+	int i;	
+	str1 = (int **)malloc(sizeof(int *));
+	str2 = (int **)malloc(sizeof(int *)*3);
+    strlong(str1,str2);
+    printf("Longer string1: %d %d %d\n", (*str1)[0],str1[0][1],(*str1)[2]);
+	printf("Longer string2: %d %d %d\n", str2[0][0],*(str2[1]),str2[0][2]);
+    return 0;
 }
 #endif
+
+
+
+
