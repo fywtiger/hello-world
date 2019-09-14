@@ -139,21 +139,22 @@ double findMedianSortedArrays(int *nums1, int nums1Size, int *nums2, int nums2Si
     int *nums = NULL;
     int numsSize = 0;
     double dresult = 0;
-
-    printf("input num1[%d]:", nums1Size);
-    for (j = 0; j < nums1Size; j++)
+#ifdef DEBUG
+    int i = 0;
+#endif
+    if (0 == nums1Size)
     {
-        printf("%d ", nums1[j]);
+        dresult = (nums2Size % 2) ? (double)(nums2[nums2Size / 2]) : ((double)nums2[nums2Size / 2 - 1] + (double)nums2[nums2Size / 2]) / 2;
+        return dresult;
     }
-    printf("\n");
-
-    printf("input num2[%d]:", nums2Size);
-    for (j = 0; j < nums2Size; j++)
+    if (0 == nums2Size)
     {
-        printf("%d ", nums2[j]);
+        dresult = (nums1Size % 2) ? (double)(nums1[nums1Size / 2]) : ((double)nums1[nums1Size / 2 - 1] + (double)nums1[nums1Size / 2]) / 2;
+        return dresult;
     }
-    printf("\n");
+
     nums = malloc(sizeof(int) * (nums1Size + nums2Size));
+
     if (NULL == nums)
     {
         printf("findMedianSortedArrays malloc memory for nums Error!\n");
@@ -166,23 +167,31 @@ double findMedianSortedArrays(int *nums1, int nums1Size, int *nums2, int nums2Si
     for (j = 0; j < nums2Size; j++)
     {
         inSite = insertNumToList(nums2[j], nums, numsSize);
-        //printf("num2[%d]:%d insertNumToList site is %d,AllMidSite is %d\n",j,nums2[j],inSite,AllMidSite);
+#ifdef DEBUG
+        printf("+++++++++++++++++++++++++++++++++++++++++++++\n");
+        printf("num2[%d]:%d insertNumToList site is %d,AllMidSite is %d\n", j, nums2[j], inSite, AllMidSite);
+#endif
         if (inSite < AllMidSite)
         {
             if (inSite < numsSize)
             {
-                memmove(&nums[inSite + 1], &nums[inSite], numsSize - inSite);
+                memmove(&nums[inSite + 1], &nums[inSite], sizeof(int) * (numsSize - inSite));
             }
             numsSize++;
             nums[inSite] = nums2[j];
         }
-
+#ifdef DEBUG
+        for (i = 0; i < numsSize; i++)
+        {
+            printf("numsSize:%d nums[%d]:%d\n", numsSize, i, nums[i]);
+        }
+#endif
         if (inSite == AllMidSite)
         {
-            //printf("===================\n");
+            printf("===================\n");
             if (0 != (nums1Size + nums2Size) % 2)
             {
-                //printf("!==================0\n");
+                printf("!==================0\n");
                 dresult = (double)nums2[j];
                 free(nums);
                 return dresult;
@@ -191,23 +200,30 @@ double findMedianSortedArrays(int *nums1, int nums1Size, int *nums2, int nums2Si
             {
                 if ((j + 1) == nums2Size)
                 {
-                    //printf("================== j:%d\n",j);
+                    printf("================== j:%d\n", j);
                     dresult = ((double)nums2[j] + (double)nums[inSite]) / 2;
                     free(nums);
                     return dresult;
                 }
                 else
                 {
-                    if (nums2[j + 1] <= nums[inSite])
+                    if (inSite >= numsSize)
                     {
-                        //printf("==================nums2[%d][%d]:%d %d,nums[%d]:%d\n",j,j+1,nums2[j],nums2[j+1],inSite,nums[inSite]);
+                        //printf("==================nums2[%d][%d]:%d %d,nums[%d]:%d\n", j, j + 1, nums2[j], nums2[j + 1], inSite, nums[inSite]);
+                        dresult = ((double)nums2[j] + (double)nums2[j + 1]) / 2;
+                        free(nums);
+                        return dresult;
+                    }
+                    else if (nums2[j + 1] <= nums[inSite])
+                    {
+                        //printf("==================nums2[%d][%d]:%d %d,nums[%d]:%d\n", j, j + 1, nums2[j], nums2[j + 1], inSite, nums[inSite]);
                         dresult = ((double)nums2[j] + (double)nums2[j + 1]) / 2;
                         free(nums);
                         return dresult;
                     }
                     else
                     {
-                        //printf("==================nums2[%d]:%d %d,nums[%d]:%d\n",j,nums2[j],inSite,nums[inSite]);
+                        //printf("==================nums2[%d][%d]:%d %d,nums[%d]:%d\n", j, j + 1, nums2[j], nums2[j + 1], inSite, nums[inSite]);
                         dresult = ((double)nums2[j] + (double)nums[inSite]) / 2;
                         free(nums);
                         return dresult;
@@ -226,13 +242,24 @@ double findMedianSortedArrays(int *nums1, int nums1Size, int *nums2, int nums2Si
             }
             else
             {
-                dresult = (double)(nums[AllMidSite] + nums[AllMidSite + 1]) / 2;
+                if (inSite > AllMidSite + 1)
+                {
+                    dresult = (double)(nums[AllMidSite] + nums[AllMidSite + 1]) / 2;
+                }
+                else
+                {
+                    dresult = (double)(nums[AllMidSite] + nums2[j]) / 2;
+                }
+
                 free(nums);
                 return dresult;
             }
         }
     }
-    return -1;
+
+    dresult = (numsSize % 2) ? (double)(nums[numsSize / 2]) : ((double)nums[numsSize / 2 - 1] + (double)nums[numsSize / 2]) / 2;
+    free(nums);
+    return dresult;
 }
 int insertNumToList(int iNum, int *numList, int numListLen)
 {
@@ -266,7 +293,7 @@ int insertNumToList(int iNum, int *numList, int numListLen)
             return nSite;
         }
     }
-    return -1;
+    return nSite;
 }
 /*********************************************************************
 041：给定一个未排序的整数数组，找出其中没有出现的最小的正整数。
@@ -288,56 +315,56 @@ int insertNumToList(int iNum, int *numList, int numListLen)
  *************************************************************************/
 int firstMissingPositive(int *nums, int numsSize)
 {
-    int mixNumber=-1;
-    int i=0,j=0;
-    int *sortNum=NULL;
-    int maxValue=-1,maxValueSite=0,sortNumSize=0;
-
-    sortNum = malloc(sizeof(int)*numsSize);
-    memset(sortNum,0,sizeof(int)*numsSize);
-    sortNumSize = numsSize;
-    while (sortNumSize>0)
+    int mixNumSite = -1;
+    int i = 0, j = 0;
+    int maxTemp = 0;
+    if (0 == numsSize || NULL == nums)
     {
-		maxValue = -1;
-        for(i=0;i<numsSize;i++)
-        {            
-            if(nums[i]>maxValue)
+        return 1;
+    }
+    for (i = 0; i < numsSize - 1; i++)
+    {
+        for (j = i + 1; j < numsSize; j++)
+        {
+            if (nums[i] < nums[j])
             {
-                maxValue = nums[i];
-                maxValueSite = i;
+                maxTemp = nums[j];
+                nums[j] = nums[i];
+                nums[i] = maxTemp;
             }
         }
-
-        if(-1 == maxValue&&sortNumSize==numsSize)
+    }
+    if (nums[0] < 1)
+    {
+        return 1;
+    }
+    else if (nums[numsSize - 1] > 1)
+    {
+        return 1;
+    }
+    else
+    {
+        for (i = numsSize - 1; i > 0; i--)
         {
-            free(sortNum);
-            return 1;
+            if (nums[i - 1] - nums[i] > 1 && nums[i - 1] > 1)
+            {
+                mixNumSite = i;
+                break;
+            }
         }
-        else if(maxValue>0)
-        {
-            nums[maxValueSite] = -1;
-            sortNum[j] = maxValue; 			        
-            j++;
-        }   
-		sortNumSize--;   		     
-    }	
-	if(sortNum[j-1]>1)
-	{
-		mixNumber = 1; 
-	}
-	else
-	{
-		for(i=j-1;i>1;i--)
-		{
-			if((sortNum[i-1]-sortNum[i])>1)
-			{
-				return (sortNum[i]+1);
-			}   
-		}
-		mixNumber = sortNum[0]+1;    
-	}    
-    free(sortNum);
-    return mixNumber;
+    }
+    if (-1 == mixNumSite)
+    {
+        return (nums[0] + 1);
+    }
+    else if (nums[mixNumSite] <= 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return (nums[mixNumSite] + 1);
+    }
 }
 
 /*********************************************************************
@@ -360,60 +387,60 @@ int firstMissingPositive(int *nums, int numsSize)
 https://leetcode-cn.com/problems/game-of-life/
 行：boardSize  列：boardColSize
 *************************************************************************/
-void gameOfLife(int** board, int boardSize, int* boardColSize)
+void gameOfLife(int **board, int boardSize, int *boardColSize)
 {
-    int i=0,j=0;
-    int ** boardEx=NULL;
-    int boardExSize=0,boardExColSize=0,nLiveSum=0;
+    int i = 0, j = 0;
+    int **boardEx = NULL;
+    int boardExSize = 0, boardExColSize = 0, nLiveSum = 0;
 
-    boardExSize = boardSize+2;
-    boardExColSize = *boardColSize+2;
-    boardEx = (int **)malloc((sizeof(int *))*boardExSize);
-    for(i=0;i<boardExSize;i++)
+    boardExSize = boardSize + 2;
+    boardExColSize = *boardColSize + 2;
+    boardEx = (int **)malloc((sizeof(int *)) * boardExSize);
+    for (i = 0; i < boardExSize; i++)
     {
-        boardEx[i] =(int *)malloc(sizeof(int)*boardExColSize);
-        for(j=0;j<boardExColSize;j++)
+        boardEx[i] = (int *)malloc(sizeof(int) * boardExColSize);
+        for (j = 0; j < boardExColSize; j++)
         {
-            if(0==i||(boardExSize-1==i))
+            if (0 == i || (boardExSize - 1 == i))
             {
                 boardEx[i][j] = 0;
             }
-            else if(0==j||(boardExColSize-1)==j)
+            else if (0 == j || (boardExColSize - 1) == j)
             {
                 boardEx[i][j] = 0;
-            }    
+            }
             else
             {
-                boardEx[i][j] = board[i-1][j-1];
-            }   
+                boardEx[i][j] = board[i - 1][j - 1];
+            }
         }
     }
-    for(i=1;i<(boardExSize-1);i++)
+    for (i = 1; i < (boardExSize - 1); i++)
     {
-        for(j=1;j<(boardExColSize-1);j++)
+        for (j = 1; j < (boardExColSize - 1); j++)
         {
-            nLiveSum=boardEx[i-1][j-1]+boardEx[i-1][j]+boardEx[i-1][j+1]+boardEx[i][j-1]+boardEx[i][j+1]+boardEx[i+1][j-1]+boardEx[i+1][j]+boardEx[i+1][j+1];
-            if(1==board[i-1][j-1])
+            nLiveSum = boardEx[i - 1][j - 1] + boardEx[i - 1][j] + boardEx[i - 1][j + 1] + boardEx[i][j - 1] + boardEx[i][j + 1] + boardEx[i + 1][j - 1] + boardEx[i + 1][j] + boardEx[i + 1][j + 1];
+            if (1 == board[i - 1][j - 1])
             {
-                if(nLiveSum<2)
+                if (nLiveSum < 2)
                 {
-                    board[i-1][j-1]=0;
+                    board[i - 1][j - 1] = 0;
                 }
-                else if(nLiveSum>3)
+                else if (nLiveSum > 3)
                 {
-                    board[i-1][j-1]=0;
-                }   
+                    board[i - 1][j - 1] = 0;
+                }
             }
-            else if (0==board[i-1][j-1])
+            else if (0 == board[i - 1][j - 1])
             {
-                if(3 == nLiveSum)
+                if (3 == nLiveSum)
                 {
-                    board[i-1][j-1]=1;
+                    board[i - 1][j - 1] = 1;
                 }
             }
         }
     }
-    for(i=0;i<boardExSize;i++)
+    for (i = 0; i < boardExSize; i++)
     {
         free(boardEx[i]);
     }
@@ -446,45 +473,45 @@ https://leetcode-cn.com/problems/brick-wall/
 |1、 5、 1、 3|      |= ===== = ===|      |1000011001|
 
 *************************************************************************/
-int leastBricks(int** wall, int wallSize, int* wallColSize)
+int leastBricks(int **wall, int wallSize, int *wallColSize)
 {
-    int i=0,j=0,insertResult=0;    
-    int wallColSizeEx=0;
-    int wallColSizeExAll=0;     
-    Result_List resultList[20000]={0};
+    int i = 0, j = 0, insertResult = 0;
+    int wallColSizeEx = 0;
+    int wallColSizeExAll = 0;
+    Result_List resultList[20000] = {0};
     int listLen = 0;
-    int maxCount = 0;    
-    
-    for(i=0;i<wallColSize[0];i++)
+    int maxCount = 0;
+
+    for (i = 0; i < wallColSize[0]; i++)
     {
         wallColSizeExAll = wallColSizeExAll + wall[0][i];
     }
-    
-    for(i=0;i<wallSize;i++)
-    {              
-        wallColSizeEx=0;        
-        for(j=0;j<wallColSize[i];j++)
+
+    for (i = 0; i < wallSize; i++)
+    {
+        wallColSizeEx = 0;
+        for (j = 0; j < wallColSize[i]; j++)
         {
-            wallColSizeEx = wallColSizeEx + wall[i][j];            
-            if(0!=wallColSizeEx && wallColSizeEx!=wallColSizeExAll) 
+            wallColSizeEx = wallColSizeEx + wall[i][j];
+            if (0 != wallColSizeEx && wallColSizeEx != wallColSizeExAll)
             {
-                insertResult = insertOneToResultList(resultList,wallColSizeEx,listLen);
-                listLen = listLen + insertResult;                
-            }               
+                insertResult = insertOneToResultList(resultList, wallColSizeEx, listLen);
+                listLen = listLen + insertResult;
+            }
         }
     }
-    maxCount = queryMaxCountFromList(resultList,listLen);  
+    maxCount = queryMaxCountFromList(resultList, listLen);
     return (wallSize - maxCount);
 }
 /******************************************************************************************************
  以每一行每一堆砖块的宽度作为键值建表，如果存在则count+1，不存在就插入一个，暂时不优化算法，插入时遍历全表
  ******************************************************************************************************/
-int insertOneToResultList(Result_List *resultList,int value,int listLen)
+int insertOneToResultList(Result_List *resultList, int value, int listLen)
 {
-    int i=0;    
-    for(i=0;i<listLen;i++)
+    int i = 0;
+    for (i = 0; i < listLen; i++)
     {
-        if(value == resultList[i].value)
+        if (value == resultList[i].value)
         {
             resultList[i].count++;
             return 0;
@@ -497,13 +524,13 @@ int insertOneToResultList(Result_List *resultList,int value,int listLen)
 /******************************************************************************************************
  查询链表中count值最大的结果返回，此处就是砖缝最多的点，用行号减去该值就是最小需要穿透的墙的行数
  ******************************************************************************************************/
-int queryMaxCountFromList(Result_List *resultList,int listLen)
+int queryMaxCountFromList(Result_List *resultList, int listLen)
 {
-    int i=0;
-    int maxCount=0;
-    for(i=0;i<listLen;i++)
+    int i = 0;
+    int maxCount = 0;
+    for (i = 0; i < listLen; i++)
     {
-        if(maxCount<resultList[i].count)
+        if (maxCount < resultList[i].count)
         {
             maxCount = resultList[i].count;
         }
@@ -531,120 +558,120 @@ n 的取值范围为 [0, 100]。
 **********************************************************************************************************************/
 int leastInterval(char *tasks, int tasksSize, int n)
 {
-    int runTime=0;
-    int i=0;       
-    int TaskSumList[101]={0}; 
-    int taskListLen=0;
-    
-    taskListLen = ChangeTaskListToSum(tasks,tasksSize,TaskSumList);
-    
-    sortTaskList(TaskSumList,&taskListLen);
+    int runTime = 0;
+    int i = 0;
+    int TaskSumList[101] = {0};
+    int taskListLen = 0;
 
-    while(tasksSize>0)
+    taskListLen = ChangeTaskListToSum(tasks, tasksSize, TaskSumList);
+
+    sortTaskList(TaskSumList, &taskListLen);
+
+    while (tasksSize > 0)
     {
-        for(i=0;i<=n;i++)
+        for (i = 0; i <= n; i++)
         {
-            if(TaskSumList[i]>0)
+            if (TaskSumList[i] > 0)
             {
                 TaskSumList[i]--;
-                tasksSize--;  
-                runTime++;                             
+                tasksSize--;
+                runTime++;
             }
-            else if(0 != tasksSize)
+            else if (0 != tasksSize)
             {
                 runTime++;
-            }                                      
+            }
         }
-        sortTaskList(TaskSumList,&taskListLen);        
+        sortTaskList(TaskSumList, &taskListLen);
     }
     return runTime;
 }
 
-void sortTaskList(int *TaskList,int *taskListLen)
+void sortTaskList(int *TaskList, int *taskListLen)
 {
-    int i=0, j=0, maxValue=0;
+    int i = 0, j = 0, maxValue = 0;
 
-    for(j=0;j<*taskListLen-1;j++)    
-    {           
-        for(i=j+1;i<*taskListLen;i++)
+    for (j = 0; j < *taskListLen - 1; j++)
+    {
+        for (i = j + 1; i < *taskListLen; i++)
         {
-            if(TaskList[j]<TaskList[i])
+            if (TaskList[j] < TaskList[i])
             {
                 maxValue = TaskList[i];
                 TaskList[i] = TaskList[j];
                 TaskList[j] = maxValue;
             }
-        }        
+        }
     }
     return;
 }
 /*将输入的调度任务列表转换为一个任务的统计列表，比如
 输入List:[ A A A B B B A D E C F Z F D C F X ] 
 转换为 sum List:[A:4 B:3 C:2 D:2 E:1 F:3 X:1 Z:1 ]:*/
-int ChangeTaskListToSum(char *tasks,int tasksSize ,int *TaskSumList)
+int ChangeTaskListToSum(char *tasks, int tasksSize, int *TaskSumList)
 {
-    int TaskList[26]={0};  
-    int taskListLen=0;
-    int i,j;
+    int TaskList[26] = {0};
+    int taskListLen = 0;
+    int i, j;
 
-    for(i=0;i<tasksSize;i++)
+    for (i = 0; i < tasksSize; i++)
     {
-        j=tasks[i]-'A';
-        if(0==TaskList[j])
+        j = tasks[i] - 'A';
+        if (0 == TaskList[j])
         {
             taskListLen++;
         }
-        TaskList[j]++;        
+        TaskList[j]++;
     }
-    
-    for(i=0,j=0;i<26;i++)
+
+    for (i = 0, j = 0; i < 26; i++)
     {
-        if(0!=TaskList[i])
+        if (0 != TaskList[i])
         {
-           TaskSumList[j] = TaskList[i];
-           j++;
+            TaskSumList[j] = TaskList[i];
+            j++;
         }
-    }    
+    }
     return taskListLen;
 }
 
 void taskRunTime()
 {
-    char tasks[MAX]={0};
-    char input[MAX]={0};
-    int i=0;
-    int taskSize=0;
-    int j=0;
+    char tasks[MAX] = {0};
+    char input[MAX] = {0};
+    int i = 0;
+    int taskSize = 0;
+    int j = 0;
     int runTime;
-    int frozenTime=0;
+    int frozenTime = 0;
     printf("Please input Tasks List:");
-    scanf("%s",input);
-    for(i=0;i<strlen(input);i++)
+    scanf("%s", input);
+    for (i = 0; i < strlen(input); i++)
     {
-        if(input[i]>='A'&&input[i]<='Z')
+        if (input[i] >= 'A' && input[i] <= 'Z')
         {
             tasks[j] = input[i];
             j++;
             taskSize++;
         }
     }
-    printf("\ntasks[%d]:[",taskSize);
-    for(i=0;i<taskSize;i++)
+    printf("\ntasks[%d]:[", taskSize);
+    for (i = 0; i < taskSize; i++)
     {
-        if(i<taskSize-1)
+        if (i < taskSize - 1)
         {
-            printf("\"%c\",",tasks[i]);
+            printf("\"%c\",", tasks[i]);
         }
         else
         {
-            printf("\"%c\"]",tasks[i]);
+            printf("\"%c\"]", tasks[i]);
         }
     }
     printf("\n");
     printf("Please input Task Frozen Tinme:");
-    scanf("%d",&frozenTime);
-    runTime = leastInterval(tasks,taskSize,frozenTime);
-    printf("Task List Mix Run Time:%d when frozenTime is %d",runTime,frozenTime);
+    scanf("%d", &frozenTime);
+    runTime = leastInterval(tasks, taskSize, frozenTime);
+    printf("Task List Mix Run Time:%d when frozenTime is %d", runTime, frozenTime);
 }
 /**********************************************************************************
 997:在一个小镇里，按从 1 到 N 标记了 N 个人。传言称，这些人中有一个是小镇上的秘密法官。
@@ -680,64 +707,63 @@ trust[i][0] != trust[i][1]
 回-1，否则就随便选取一个人，然后从trustList列表中找出他信任的所有人，然后再去看trustNum剩下的其他人对应的位置是否也是被信任的，如
 果都是1则说明该人员就是被信任人员，如果找出不这么一个人，则返回-1
 **********************************************************************************/
-int findJudge(int N, int** trust, int trustSize, int* trustColSize)
+int findJudge(int N, int **trust, int trustSize, int *trustColSize)
 {
-    int i=0,j=0,len=0;
-    int trustList[1001][1001]={0};    
-    int line=0,col=0;
-    int *trustNum,trustNumSite=0,trustValue=0;
+    int i = 0, j = 0, len = 0;
+    int trustList[1001][1001] = {0};
+    int line = 0, col = 0;
+    int *trustNum, trustNumSite = 0, trustValue = 0;
 
-    if(1==N)
+    if (1 == N)
     {
         return 1;
     }
-    trustNum = malloc(sizeof(int)*N);   
-    memset(trustNum,0,sizeof(int)*N);
-    for(i=0;i<trustSize;i++)
+    trustNum = malloc(sizeof(int) * N);
+    memset(trustNum, 0, sizeof(int) * N);
+    for (i = 0; i < trustSize; i++)
     {
         line = trust[i][0];
         col = trust[i][1];
-        trustList[line][col] = 1;        
-        for(j=0;j<N;j++)
+        trustList[line][col] = 1;
+        for (j = 0; j < N; j++)
         {
-            if(0 == trustNum[j])
+            if (0 == trustNum[j])
             {
-               trustNum[j] = trust[i][0];
-               len++;
-               break;
+                trustNum[j] = trust[i][0];
+                len++;
+                break;
             }
-            else if(trustNum[j] == trust[i][0])     
+            else if (trustNum[j] == trust[i][0])
             {
                 break;
-            }       
+            }
         }
-    }    
-   
-    if(len < N-1)
+    }
+
+    if (len < N - 1)
     {
-        free(trustNum);        
+        free(trustNum);
         return -1;
     }
     else
     {
-        trustNumSite=trustNum[0];
-        for(i=0;i<1001;i++)
-        {   
-            if(0 != trustList[trustNumSite][i])     
+        trustNumSite = trustNum[0];
+        for (i = 0; i < 1001; i++)
+        {
+            if (0 != trustList[trustNumSite][i])
             {
                 trustValue = 1;
-                for(j=0;j<len;j++)
+                for (j = 0; j < len; j++)
                 {
-                    
-                    trustNumSite=trustNum[j];        
+                    trustNumSite = trustNum[j];
                     trustValue = trustValue & trustList[trustNumSite][i];
                 }
-                if(1==trustValue)
+                if (1 == trustValue)
                 {
                     free(trustNum);
                     return i;
-                }      
-            }                     
+                }
+            }
         }
     }
 
@@ -763,27 +789,27 @@ int findJudge(int N, int** trust, int trustSize, int* trustColSize)
 链接：https://leetcode-cn.com/problems/decrease-elements-to-make-array-zigzag
 解题：
 **********************************************************************************/
-int movesToMakeZigzag(int* nums, int numsSize)
+int movesToMakeZigzag(int *nums, int numsSize)
 {
-    int operationStep=-1;    
+    int operationStep = -1;
     switch (numsSize)
     {
-        case 1:
-            operationStep = 0;
-            break;
-        case 2:
-            operationStep = TwoNumbers(nums);
-            break;
-        default:
-            operationStep = MoreThreeNumbers(nums,numsSize);
-            break;        
-    }    
+    case 1:
+        operationStep = 0;
+        break;
+    case 2:
+        operationStep = TwoNumbers(nums);
+        break;
+    default:
+        operationStep = MoreThreeNumbers(nums, numsSize);
+        break;
+    }
     return operationStep;
 }
 
-int TwoNumbers(int* nums)
+int TwoNumbers(int *nums)
 {
-    if(nums[0]==nums[1])
+    if (nums[0] == nums[1])
     {
         return 1;
     }
@@ -793,69 +819,68 @@ int TwoNumbers(int* nums)
     }
 }
 
-int MoreThreeNumbers(int* nums,int numsSize)
+int MoreThreeNumbers(int *nums, int numsSize)
 {
-    int i=0;
+    int i = 0;
     int operationStep1 = 0;
     int operationStep2 = 0;
     int flag = 1;
-    int numList[1002]={0};
-    
-    memcpy(numList,nums,sizeof(int)*numsSize);    
-    
-    for(i=0;i<numsSize-1;i=i+2)
+    int numList[1002] = {0};
+
+    memcpy(numList, nums, sizeof(int) * numsSize);
+
+    for (i = 0; i < numsSize - 1; i = i + 2)
     {
         flag = 1;
-        while(flag)
+        while (flag)
         {
-            if(numList[i+1]<=numList[i])
+            if (numList[i + 1] <= numList[i])
             {
                 operationStep2++;
                 //printf("11111 numLise[%d]:%d<numList[%d]:%d\n",i+1,numList[i+1],i,numList[i]);
                 numList[i]--;
-                
             }
-            else if(numList[i+1]<=numList[i+2])
+            else if (numList[i + 1] <= numList[i + 2])
             {
-                operationStep2++;                
+                operationStep2++;
                 //printf("22222 numLise[%d]:%d<numList[%d]:%d\n",i+1,numList[i+1],i+2,numList[i+2]);
-                numList[i+2]--;
+                numList[i + 2]--;
             }
-            else 
+            else
             {
                 flag = 0;
             }
         }
     }
 
-    memcpy(numList,nums,sizeof(int)*numsSize);
-    numList[numsSize]=1001;
-    
-    for(i=0;i<numsSize-1;i=i+2)
+    memcpy(numList, nums, sizeof(int) * numsSize);
+    numList[numsSize] = 1001;
+
+    for (i = 0; i < numsSize - 1; i = i + 2)
     {
         flag = 1;
-        while(flag)
+        while (flag)
         {
-            if(numList[i+1]>=numList[i])
+            if (numList[i + 1] >= numList[i])
             {
-                operationStep1++;                
+                operationStep1++;
                 //printf("33333 numLise[%d]:%d>numList[%d]:%d\n",i+1,numList[i+1],i,numList[i]);
-                numList[i+1]--;
+                numList[i + 1]--;
             }
-            else if(numList[i+1]>=numList[i+2])
+            else if (numList[i + 1] >= numList[i + 2])
             {
-                operationStep1++;                
+                operationStep1++;
                 //printf("44444 numLise[%d]:%d>numList[%d]:%d\n",i+1,numList[i+1],i+2,numList[i+2]);
-                numList[i+1]--;
+                numList[i + 1]--;
             }
-            else 
+            else
             {
                 flag = 0;
             }
         }
     }
-    printf("operationStep1:%d operationStep2:%d\n",operationStep1,operationStep2);
-    return (operationStep1<operationStep2?operationStep1:operationStep2);       
+    printf("operationStep1:%d operationStep2:%d\n", operationStep1, operationStep2);
+    return (operationStep1 < operationStep2 ? operationStep1 : operationStep2);
 }
 /*************************************************************************************************
 leetcode:406 假设有打乱顺序的一群人站成一个队列。 每个人由一个整数对(h, k)表示，其中h是这个人的身高，k是排在这个人前面且身高大于
@@ -870,221 +895,220 @@ leetcode:406 假设有打乱顺序的一群人站成一个队列。 每个人由
  * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
  *************************************************************************************************/
 
-int** reconstructQueue(int** people, int peopleSize, int* peopleColSize, int* returnSize, int** returnColumnSizes)
+int **reconstructQueue(int **people, int peopleSize, int *peopleColSize, int *returnSize, int **returnColumnSizes)
 {
-    NODE_PEOPLE* peopleList = NULL;
-    int i=0,nodeListLen=0;
-    NODE_LIST head=NULL,now=NULL;
-    int** returnList=NULL;
+    NODE_PEOPLE *peopleList = NULL;
+    int i = 0, nodeListLen = 0;
+    NODE_LIST head = NULL, now = NULL;
+    int **returnList = NULL;
 
-    peopleList = SortQueueList(people,peopleSize,&nodeListLen);    
-    #ifdef DEBUG 
-    printf("nodeListLen is %d \n",nodeListLen);
-    for(i=0;i<nodeListLen;i++)
+    peopleList = SortQueueList(people, peopleSize, &nodeListLen);
+#ifdef DEBUG
+    printf("nodeListLen is %d \n", nodeListLen);
+    for (i = 0; i < nodeListLen; i++)
     {
-        printf("peopleList[%d].height:%d\n",i,peopleList[i].height);
-        printf("peopleList[%d].sortSite:",i);
-        for(j=0;j<MAX_PEOPLE;j++)
+        printf("peopleList[%d].height:%d\n", i, peopleList[i].height);
+        printf("peopleList[%d].sortSite:", i);
+        for (j = 0; j < MAX_PEOPLE; j++)
         {
-            if(peopleList[i].sortSite[j] == 1)
+            if (peopleList[i].sortSite[j] == 1)
             {
-                printf("%d ",j);
+                printf("%d ", j);
             }
         }
         printf("\n");
     }
     printf("\n");
-    #endif
-    head = insertNodeList(nodeListLen,peopleList);
+#endif
+    head = insertNodeList(nodeListLen, peopleList);
 
-    *returnSize = peopleSize;       
-    returnList = (int **)malloc(sizeof(int *)*peopleSize);
-    *returnColumnSizes = (int *)malloc(sizeof(int)*peopleSize);
-    for(i=0;i<peopleSize;i++)
+    *returnSize = peopleSize;
+    returnList = (int **)malloc(sizeof(int *) * peopleSize);
+    *returnColumnSizes = (int *)malloc(sizeof(int) * peopleSize);
+    for (i = 0; i < peopleSize; i++)
     {
-        returnList[i] = (int *)malloc(sizeof(int)*peopleColSize[i]);
-        (*returnColumnSizes)[i]=peopleColSize[i];        
-    }   
+        returnList[i] = (int *)malloc(sizeof(int) * peopleColSize[i]);
+        (*returnColumnSizes)[i] = peopleColSize[i];
+    }
     now = head;
     printf("returnList:");
-    while(NULL != now)
+    while (NULL != now)
     {
         returnList[i][0] = now->height;
         returnList[i][1] = now->site;
-        printf("[%d,%d] ",returnList[i][0],returnList[i][1]);
+        printf("[%d,%d] ", returnList[i][0], returnList[i][1]);
         i++;
         now = now->next;
         free(head);
-        head = now;        
+        head = now;
     }
     printf("\n");
-    free(peopleList);   
-    return returnList;    
+    free(peopleList);
+    return returnList;
 }
 
 void printList(NODE_LIST head)
 {
     printf("List:");
-    while(NULL != head)
+    while (NULL != head)
     {
-        printf("[%d,%d] ",head->height,head->site);
+        printf("[%d,%d] ", head->height, head->site);
         head = head->next;
     }
     printf("\n");
 }
 /*将people输入的数据按照身高从高到低排序，在每个排序的结构中sortSize表示people中出现的该身高的大于等于自己的值
 nodeListLen表示peopleList数组的长度，相同身高被合并到一个数组结构中*/
-NODE_PEOPLE* SortQueueList(int** people, int peopleSize, int *nodeListLen)
+NODE_PEOPLE *SortQueueList(int **people, int peopleSize, int *nodeListLen)
 {
-    NODE_PEOPLE* peopleList = NULL;
+    NODE_PEOPLE *peopleList = NULL;
     NODE_PEOPLE temp;
-    int i=0,j=0;
-    int nodeHeight=0,sortSite=0;
-    peopleList =(NODE_PEOPLE*) malloc(sizeof(NODE_PEOPLE)*peopleSize);
-    memset(peopleList,-1,sizeof(NODE_PEOPLE)*peopleSize);
+    int i = 0, j = 0;
+    int nodeHeight = 0, sortSite = 0;
+    peopleList = (NODE_PEOPLE *)malloc(sizeof(NODE_PEOPLE) * peopleSize);
+    memset(peopleList, -1, sizeof(NODE_PEOPLE) * peopleSize);
     *nodeListLen = 0;
-    for(i=0;i<peopleSize;i++)
+    for (i = 0; i < peopleSize; i++)
     {
         nodeHeight = people[i][0];
-        sortSite = people[i][1]; 
-        for(j=0;j<peopleSize;j++)       
+        sortSite = people[i][1];
+        for (j = 0; j < peopleSize; j++)
         {
-            if(-1==peopleList[j].height)
+            if (-1 == peopleList[j].height)
             {
                 peopleList[j].height = nodeHeight;
                 peopleList[j].sortSite[sortSite] = 1;
-                *nodeListLen = *nodeListLen+1;
+                *nodeListLen = *nodeListLen + 1;
                 break;
             }
             else
             {
-                if(nodeHeight == peopleList[j].height)
+                if (nodeHeight == peopleList[j].height)
                 {
                     peopleList[j].sortSite[sortSite] = 1;
                     break;
-                }     
-            }
-        }
-    }      
-    for(i=0;i<(*nodeListLen-1);i++)
-    {
-        for(j=i+1;j<*nodeListLen;j++)
-        {
-            if(peopleList[i].height<peopleList[j].height)
-            {
-                memcpy(&temp,&peopleList[i],sizeof(NODE_PEOPLE));
-                memcpy(&peopleList[i],&peopleList[j],sizeof(NODE_PEOPLE));
-                memcpy(&peopleList[j],&temp,sizeof(NODE_PEOPLE));
+                }
             }
         }
     }
-  
+    for (i = 0; i < (*nodeListLen - 1); i++)
+    {
+        for (j = i + 1; j < *nodeListLen; j++)
+        {
+            if (peopleList[i].height < peopleList[j].height)
+            {
+                memcpy(&temp, &peopleList[i], sizeof(NODE_PEOPLE));
+                memcpy(&peopleList[i], &peopleList[j], sizeof(NODE_PEOPLE));
+                memcpy(&peopleList[j], &temp, sizeof(NODE_PEOPLE));
+            }
+        }
+    }
+
     return peopleList;
 }
 
-NODE_LIST insertNodeList(int nodeListLen,NODE_PEOPLE* peopleList)
+NODE_LIST insertNodeList(int nodeListLen, NODE_PEOPLE *peopleList)
 {
-    NODE_LIST head=NULL,peopleNode=NULL,insertSite=NULL,next=NULL;
-    int i,j,z=0,heightSite=0;
-    for(i=0;i<nodeListLen;i++)
-    {              
-        for(j=0;j<MAX_PEOPLE;j++)
+    NODE_LIST head = NULL, peopleNode = NULL, insertSite = NULL, next = NULL;
+    int i, j, z = 0, heightSite = 0;
+    for (i = 0; i < nodeListLen; i++)
+    {
+        for (j = 0; j < MAX_PEOPLE; j++)
         {
-            if(peopleList[i].sortSite[j] == 1)
-            {                
-                peopleNode = malloc(sizeof(struct nodeList));                    
+            if (peopleList[i].sortSite[j] == 1)
+            {
+                peopleNode = malloc(sizeof(struct nodeList));
                 peopleNode->height = peopleList[i].height;
                 peopleNode->site = j;
                 heightSite = peopleNode->site;
                 peopleNode->next = NULL;
-                if(0==heightSite)     
+                if (0 == heightSite)
                 {
                     next = head;
                     head = peopleNode;
-                    head->next = next;   
-                    printf("---------------%d----------------\n",z++);                     
-                }         
+                    head->next = next;
+                    printf("---------------%d----------------\n", z++);
+                }
                 else
                 {
                     insertSite = head;
-                    while(heightSite>1)
+                    while (heightSite > 1)
                     {
-                        insertSite=insertSite->next;
+                        insertSite = insertSite->next;
                         heightSite--;
                     }
                     next = insertSite->next;
                     insertSite->next = peopleNode;
                     peopleNode->next = next;
-                    printf("---------------%d----------------\n",z++);
-                }               
+                    printf("---------------%d----------------\n", z++);
+                }
                 printList(head);
             }
-        }        
+        }
     }
     return head;
 }
 /*************************************************************************************************
 leetcode406解题优化：直接进行队列排序，不再转换结构
  *************************************************************************************************/
-int** reconstructQueue1(int** people, int peopleSize, int* peopleColSize, int* returnSize, int** returnColumnSizes)
+int **reconstructQueue1(int **people, int peopleSize, int *peopleColSize, int *returnSize, int **returnColumnSizes)
 {
-    int **SortPeople = NULL,**returnList = NULL;
-    NODE_LIST head=NULL,now=NULL;
-    int i=0;
+    int **SortPeople = NULL, **returnList = NULL;
+    NODE_LIST head = NULL, now = NULL;
+    int i = 0;
 
-    SortPeople = SortQueueList1(people,peopleSize,peopleColSize);
-  
-    head = insertNodeList1(SortPeople,peopleSize);
+    SortPeople = SortQueueList1(people, peopleSize, peopleColSize);
 
-    *returnSize = peopleSize;       
-    returnList = (int **)malloc(sizeof(int *)*peopleSize);
-    *returnColumnSizes = (int *)malloc(sizeof(int)*peopleSize);
-    for(i=0;i<peopleSize;i++)
+    head = insertNodeList1(SortPeople, peopleSize);
+
+    *returnSize = peopleSize;
+    returnList = (int **)malloc(sizeof(int *) * peopleSize);
+    *returnColumnSizes = (int *)malloc(sizeof(int) * peopleSize);
+    for (i = 0; i < peopleSize; i++)
     {
-        returnList[i] = (int *)malloc(sizeof(int)*peopleColSize[i]);
-        (*returnColumnSizes)[i]=peopleColSize[i];        
-    }   
-    i=0;
+        returnList[i] = (int *)malloc(sizeof(int) * peopleColSize[i]);
+        (*returnColumnSizes)[i] = peopleColSize[i];
+    }
+    i = 0;
     now = head;
     printf("returnList:");
-    while(NULL != now)
+    while (NULL != now)
     {
         returnList[i][0] = now->height;
         returnList[i][1] = now->site;
-        printf("[%d,%d] ",returnList[i][0],returnList[i][1]);
+        printf("[%d,%d] ", returnList[i][0], returnList[i][1]);
         i++;
         now = now->next;
         free(head);
-        head = now;        
+        head = now;
     }
     printf("\n");
-    for(i=0;i<peopleSize;i++)
+    for (i = 0; i < peopleSize; i++)
     {
         free(SortPeople[i]);
     }
     free(SortPeople);
-    return returnList;  
-
+    return returnList;
 }
 
-int** SortQueueList1(int** people, int peopleSize,int* peopleColSize)
+int **SortQueueList1(int **people, int peopleSize, int *peopleColSize)
 {
     int **SortPeople = NULL;
-    int i=0,j=0;
-    int temp[2]={0};
+    int i = 0, j = 0;
+    int temp[2] = {0};
 
-    SortPeople = (int **)malloc(sizeof(int *)*peopleSize);
-    for(i=0;i<peopleSize;i++)
+    SortPeople = (int **)malloc(sizeof(int *) * peopleSize);
+    for (i = 0; i < peopleSize; i++)
     {
-        SortPeople[i] = (int *)malloc(sizeof(int)*peopleColSize[i]);        
-        memcpy(SortPeople[i],people[i],peopleColSize[i]*sizeof(int));
+        SortPeople[i] = (int *)malloc(sizeof(int) * peopleColSize[i]);
+        memcpy(SortPeople[i], people[i], peopleColSize[i] * sizeof(int));
     }
-    
-    for(i=0;i<peopleSize-1;i++)
+
+    for (i = 0; i < peopleSize - 1; i++)
     {
-        for(j=i+1;j<peopleSize;j++)
+        for (j = i + 1; j < peopleSize; j++)
         {
-            if(SortPeople[i][0]<SortPeople[j][0])
+            if (SortPeople[i][0] < SortPeople[j][0])
             {
                 temp[0] = SortPeople[i][0];
                 temp[1] = SortPeople[i][1];
@@ -1093,7 +1117,7 @@ int** SortQueueList1(int** people, int peopleSize,int* peopleColSize)
                 SortPeople[j][0] = temp[0];
                 SortPeople[j][1] = temp[1];
             }
-            else if((SortPeople[i][0]==SortPeople[j][0])&&(SortPeople[i][1]>SortPeople[j][1]))
+            else if ((SortPeople[i][0] == SortPeople[j][0]) && (SortPeople[i][1] > SortPeople[j][1]))
             {
                 temp[0] = SortPeople[i][0];
                 temp[1] = SortPeople[i][1];
@@ -1101,7 +1125,7 @@ int** SortQueueList1(int** people, int peopleSize,int* peopleColSize)
                 SortPeople[i][1] = SortPeople[j][1];
                 SortPeople[j][0] = temp[0];
                 SortPeople[j][1] = temp[1];
-            }            
+            }
         }
     }
     return SortPeople;
@@ -1109,35 +1133,35 @@ int** SortQueueList1(int** people, int peopleSize,int* peopleColSize)
 
 NODE_LIST insertNodeList1(int **SortPeople, int peopleSize)
 {
-    NODE_LIST head=NULL,peopleNode=NULL,insertSite=NULL,next=NULL;
-    int i,z=0,heightSite=0;
-    for(i=0;i<peopleSize;i++)
-    {    
-        peopleNode = malloc(sizeof(struct nodeList));                    
+    NODE_LIST head = NULL, peopleNode = NULL, insertSite = NULL, next = NULL;
+    int i, z = 0, heightSite = 0;
+    for (i = 0; i < peopleSize; i++)
+    {
+        peopleNode = malloc(sizeof(struct nodeList));
         peopleNode->height = SortPeople[i][0];
         peopleNode->site = SortPeople[i][1];
         heightSite = peopleNode->site;
         peopleNode->next = NULL;
-        if(0==heightSite)     
+        if (0 == heightSite)
         {
             next = head;
             head = peopleNode;
-            head->next = next;   
-            printf("---------------%d----------------\n",z++);                     
-        }         
+            head->next = next;
+            printf("---------------%d----------------\n", z++);
+        }
         else
         {
             insertSite = head;
-            while(heightSite>1)
+            while (heightSite > 1)
             {
-                insertSite=insertSite->next;
+                insertSite = insertSite->next;
                 heightSite--;
             }
             next = insertSite->next;
             insertSite->next = peopleNode;
             peopleNode->next = next;
-            printf("---------------%d----------------\n",z++);
-        }               
+            printf("---------------%d----------------\n", z++);
+        }
         printList(head);
     }
     return head;
