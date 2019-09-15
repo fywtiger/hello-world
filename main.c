@@ -52,6 +52,10 @@ int main(int argc, char const *argv[])
             case 'h':
                 PrintMap();
                 break;
+            case 'k':
+            case 'K':
+                skillPrint();
+                break;
             case 'q':
             case 'Q':
                 printf("Bye! Quit main function.\n");
@@ -78,6 +82,7 @@ void PrintMap()
     printf("   8       Talgorithm                          Show some Classical Talgorithm!\n");
     printf("   9       PreTreeCreatAndOrder                Create a Pretree and print the Pretree!\n");
     printf("   a       taskRunTime                         Get the Run Time of one Task List!\n");
+    printf("   k       skillPrint                          Show the Dota skill number!\n");
     printf("   h       PrintMap                            Print Function Map!\n");
     printf("   q       Quitmain                            Quit main Function!\n");
     return;

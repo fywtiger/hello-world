@@ -729,3 +729,57 @@ void PreTreeCreatAndOrder()
     FreeTree(root);
 	return ;
 }
+/***************************************************************************************************************
+ 假设卡尔能召唤n种元素，并且身上同时能挂m个元素，则卡尔最多能搓出多少个技能？比如能够召唤1/2/3三种元素，能够挂最多3个元素，
+ 则能够最多使用10中技能：1/1/1 1/1/2 1/1/3  1/2/2 1/2/3 2/2/2 2/2/3 3/3/1 3/3/2 3/3/3,内容相同顺序不同认为是一种技能
+ **************************************************************************************************************/
+unsigned int skill(unsigned int elem_num, unsigned int slot_num)
+{
+    unsigned int skill_num = 0;
+    int elem_i_slot_num = 0;
+
+    if (elem_num == 0)
+    {
+        return 0; //如果卡尔连一种元素都召唤不来，自然搓不出任何技能
+    }
+    else if (elem_num == 1)
+    {
+        return 1; //当只能召唤一种元素时，卡尔身上就算同时能挂m个元素，也只能搓出一种技能
+    }
+
+    if (slot_num == 0)
+    {
+        return 1; //当代码运行到此处时，说明卡尔还能召唤1种以上的技能，但此时他身上已经挂满了元素，所以能搓出的技能已经是固定的一种
+    }
+    else if (slot_num == 1)
+    {
+        return elem_num; //当卡尔身上只能挂一个元素时，就算能召唤k种元素，也只能搓出k种技能
+    }
+    //分情况讨论：
+    //如果已知第i种元素占0个槽位，则卡尔能搓出技能f(k,m)等于f(k-1, m)；
+    //如果已知第i种元素占1个槽位，则卡尔能搓出的技能f(k,m)等于f(k-1, m-1)，
+    //以此类推，将第i种元素的所有可能槽位占据情况累加起来，就得到了卡尔所有能搓出的技能，
+    //又因为技能跟元素排列顺序无关，所以总技能数就是
+    //f(k,m) = f(k-1, m) + f(k-1, m-1) + ... + f(k-1, 0)
+    for (elem_i_slot_num = 0; elem_i_slot_num <= slot_num; elem_i_slot_num++)
+    {
+        skill_num += skill(elem_num - 1, slot_num - elem_i_slot_num);
+    }
+    return skill_num;
+}
+
+void skillPrint()
+{
+    unsigned int element;
+    unsigned int slot;
+    unsigned int skill_num;
+
+    printf("Please input Dota element number:");
+    scanf("%d", &element);
+    printf("Please input slot number:");
+    scanf("%d", &slot);
+
+    skill_num = skill(element,slot);
+    printf("The skill number is %ld \n",skill_num);
+    return;
+}

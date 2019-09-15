@@ -118,6 +118,9 @@ int** SortQueueList1(int** people, int peopleSize,int* peopleColSize);
 NODE_LIST insertNodeList1(int **SortPeople, int peopleSize);
 int insertOneToResultList(Result_List *resultList,int value,int listLen);
 int queryMaxCountFromList(Result_List *resultList,int listLen);
+
+void skillPrint();
+unsigned int skill(unsigned int elem_num, unsigned int slot_num);
 #endif
 
 
