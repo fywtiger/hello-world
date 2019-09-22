@@ -154,7 +154,6 @@ double findMedianSortedArrays(int *nums1, int nums1Size, int *nums2, int nums2Si
     }
 
     nums = malloc(sizeof(int) * (nums1Size + nums2Size));
-
     if (NULL == nums)
     {
         printf("findMedianSortedArrays malloc memory for nums Error!\n");
@@ -1165,4 +1164,287 @@ NODE_LIST insertNodeList1(int **SortPeople, int peopleSize)
         printList(head);
     }
     return head;
+}
+/*************************************************************************************************
+1160. 拼写单词
+给你一份『词汇表』（字符串数组） words 和一张『字母表』（字符串） chars。
+假如你可以用 chars 中的『字母』（字符）拼写出 words 中的某个『单词』（字符串），那么我们就认为你掌握了这个单词。
+注意：每次拼写时，chars 中的每个字母都只能用一次。返回词汇表 words 中你掌握的所有单词的 长度之和。
+示例 1：
+输入：words = ["cat","bt","hat","tree"], chars = "atach"
+输出：6 解释： 
+可以形成字符串 "cat" 和 "hat"，所以答案是 3 + 3 = 6。
+示例 2：
+输入：words = ["hello","world","leetcode"], chars = "welldonehoneyr"
+输出：10 解释：
+可以形成字符串 "hello" 和 "world"，所以答案是 5 + 5 = 10。
+提示：
+1、1<= words.length <= 1000
+2、1<= words[i].length, chars.length <= 100
+3、所有字符串中都仅包含小写英文字母
+链接：https://leetcode-cn.com/problems/find-words-that-can-be-formed-by-characters
+*************************************************************************************************/
+int countCharacters(char **words, int wordsSize, char *chars)
+{
+    int charList[26] = {0};
+    int queryList[26] = {0};
+    int i = 0, site = 0, j = 0, worldLen = 0;
+    int returnLen = 0;
+    for (i = 0; i < strlen(chars); i++)
+    {
+        site = chars[i] - 'a';
+        charList[site]++;
+    }
+
+    for (i = 0; i < wordsSize; i++)
+    {
+        memcpy(queryList, charList, sizeof(charList));
+        worldLen = strlen(words[i]);
+        for (j = 0; j < worldLen; j++)
+        {
+            site = words[i][j] - 'a';
+            if (0 == queryList[site])
+            {
+                break;
+            }
+            else
+            {
+                queryList[site]--;
+            }
+        }
+        if (j == worldLen)
+        {
+            returnLen = returnLen + worldLen;
+        }
+    }
+    return returnLen;
+}
+/*************************************************************************************************
+1162. 地图分析
+你现在手里有一份大小为 N x N 的『地图』（网格） grid，上面的每个『区域』（单元格）都用 0 和 1 标记好了。其中 0 代表海洋，1 代表陆地，
+你知道距离陆地区域最远的海洋区域是是哪一个吗？请返回该海洋区域到离它最近的陆地区域的距离。
+我们这里说的距离是『曼哈顿距离』（ Manhattan Distance）：(x0, y0) 和 (x1, y1) 这两个区域之间的距离是 |x0 - x1| + |y0 - y1| 
+如果我们的地图上只有陆地或者海洋，请返回 -1。
+输入：[[1,0,1],[0,0,0],[1,0,1]]
+输出：2
+解释： 
+海洋区域 (1, 1) 和所有陆地区域之间的距离都达到最大，最大距离为 2。
+输入：[[1,0,0],[0,0,0],[0,0,0]]
+输出：4
+解释： 
+海洋区域 (2, 2) 和所有陆地区域之间的距离都达到最大，最大距离为 4。
+提示：
+1 <= grid.length == grid[0].length <= 100
+grid[i][j] 不是 0 就是 1
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/as-far-from-land-as-possible
+1600ms
+*************************************************************************************************/
+int maxDistance(int **grid, int gridSize, int *gridColSize)
+{
+    int i, j;
+    OCEAN *oceanHead = NULL, *oceanNode = NULL, *oceanNow = NULL;
+    LAND *landHead = NULL, *landNode = NULL, *landNow = NULL;
+    int distanceMax = 200, distance = 0, returnMax = -1, flag = 1;
+
+    for (i = 0; i < gridSize; i++)
+    {
+        for (j = 0; j < gridColSize[i]; j++)
+        {
+            if (grid[i][j] == 0)
+            {
+                oceanNode = malloc(sizeof(struct ocean));
+                oceanNode->x = i;
+                oceanNode->y = j;
+                oceanNode->next = NULL;
+                if (NULL == oceanHead)
+                {
+                    oceanHead = oceanNode;
+                    oceanNow = oceanHead;
+                }
+                else
+                {
+                    oceanNow->next = oceanNode;
+                    oceanNow = oceanNode;
+                }
+            }
+            else if (grid[i][j] == 1)
+            {
+                landNode = malloc(sizeof(struct land));
+                landNode->x = i;
+                landNode->y = j;
+                landNode->next = NULL;
+                if (NULL == landHead)
+                {
+                    landHead = landNode;
+                    landNow = landHead;
+                }
+                else
+                {
+                    landNow->next = landNode;
+                    landNow = landNode;
+                }
+            }
+        }
+    }
+    if (NULL == oceanHead || NULL == landHead)
+    {
+        return returnMax;
+    }
+    oceanNow = oceanHead;
+    while (NULL != oceanNow)
+    {
+        distanceMax = (gridSize - 1) * 2;
+        flag = 1;
+        landNow = landHead;
+        while (NULL != landNow)
+        {
+            distance = abs(oceanNow->x - landNow->x) + abs(oceanNow->y - landNow->y);
+            if (distance <= returnMax)
+            {
+                flag = 0;
+                break;
+            }
+            if (distance < distanceMax)
+            {
+                distanceMax = distance;
+            }
+            landNow = landNow->next;
+        }
+        oceanNow = oceanNow->next;
+        if (distanceMax > returnMax && flag)
+        {
+            returnMax = distanceMax;
+        }
+    }
+    return returnMax;
+}
+
+/*************************************************************************************************
+1162. 地图分析 调优 80ms
+*************************************************************************************************/
+int maxDistance_o(int **grid, int gridSize, int *gridColSize)
+{
+    int i = 0, j = 0, landNum = 0, gridNum = 0, flag = 1;
+    int returnMax = -1;
+    int **gridNew = NULL;    
+
+    gridNew = (int **)malloc(sizeof(int *) * (gridSize + 2));
+    for (i = 0; i < gridSize + 2; i++)
+    {
+        gridNew[i] = malloc(sizeof(int) * (gridColSize[0] + 2));
+    }
+
+    for (i = 1; i < (gridSize + 1); i++)
+    {
+        for (j = 1; j < (gridColSize[i - 1] + 1); j++)
+        {
+            gridNew[i][j] = grid[i - 1][j - 1];
+        }
+    }
+
+    while (1)
+    {
+        gridNum = 0;
+        for (i = 1; i < gridSize + 1; i++)
+        {
+            for (j = 1; j < gridColSize[i - 1] + 1; j++)
+            {
+                gridNum++;
+                if (0 != gridNew[i][j] && flag == gridNew[i][j])
+                {
+                    landNum++;
+                    gridNew[i - 1][j] = (gridNew[i - 1][j] == 0) ? (flag + 1) : gridNew[i - 1][j];
+                    gridNew[i + 1][j] = (gridNew[i + 1][j] == 0) ? (flag + 1) : gridNew[i + 1][j];
+                    gridNew[i][j - 1] = (gridNew[i][j - 1] == 0) ? (flag + 1) : gridNew[i][j - 1];
+                    gridNew[i][j + 1] = (gridNew[i][j + 1] == 0) ? (flag + 1) : gridNew[i][j + 1];
+                }
+            }
+        }
+        flag++;
+        if (landNum == 0 || ((landNum == gridNum) && (2 == flag)))
+        {
+            return returnMax;
+        }
+        else if (landNum == gridNum)
+        {
+            returnMax = flag - 2;
+            break;
+        }
+    }
+    return returnMax;
+}
+/*************************************************************************************************
+992. K 个不同整数的子数组
+给定一个正整数数组 A，如果 A 的某个子数组中不同整数的个数恰好为 K，则称 A 的这个连续、不一定独立的子数组为好子数组。
+（例如，[1,2,3,1,2] 中有 3 个不同的整数：1，2，以及 3。）返回 A 中好子数组的数目。
+示例 1：
+输出：A = [1,2,1,2,3], K = 2
+输入：7
+解释：恰好由 2 个不同整数组成的子数组：[1,2], [2,1], [1,2], [2,3], [1,2,1], [2,1,2], [1,2,1,2].
+示例 2：
+输入：A = [1,2,1,3,4], K = 3
+输出：3
+解释：恰好由 3 个不同整数组成的子数组：[1,2,1,3], [2,1,3], [1,3,4].
+提示：
+1 <= A.length <= 20000
+1 <= A[i] <= A.length
+1 <= K <= A.length
+链接：https://leetcode-cn.com/problems/subarrays-with-k-different-integers
+*************************************************************************************************/
+int subarraysWithKDistinct(int* A, int ASize, int K)
+{
+    
+    int i=0,fillValue=1,overFlag=0,result=0;
+    int *resultArray=NULL;
+    resultArray = malloc(sizeof(int)*ASize);
+
+    //memset(resultArray,0,sizeof(int)*ASize);
+    for(i=0;i<ASize;i++)
+    {
+        resultArray[A[i]-1]=0;
+    }
+
+    for(i=0;i<ASize-K+1;i++)
+    {        
+        result = result + checkArray(A,K,i,ASize,resultArray,&overFlag,fillValue);        
+        //printf("result:%d,startSite:%d flag:%d fillValue:%d\n",result,i,overFlag,fillValue);
+        fillValue++;
+        if(TRUE==overFlag)
+        {
+            break;
+        }
+    }
+    free(resultArray);
+    return result;
+}
+int checkArray(int* A,int K,int startSite,int ASize,int *resultArray,int *overFlag,int fillValue)
+{
+    int i=0;
+    int numSite=0;
+    int kLen=0,result=0;    
+    for(i=startSite;i<ASize;i++)
+    {
+        numSite = A[i]-1;        
+        //printf("i:%d resultArray[%d]:%d fillValue:%d\n",i,A[i],resultArray[numSite],fillValue);
+        if(fillValue != resultArray[numSite])
+        {            
+            resultArray[numSite]=fillValue;
+            kLen++;            
+        }        
+        if(kLen==K)
+        {
+            result++;
+        }
+        else if(kLen>K)
+        {        
+            resultArray[numSite]=fillValue; 
+            return result;
+        }        
+    }
+    if (kLen < K)
+    {
+        *overFlag = 1;
+    }
+    return result;
 }
